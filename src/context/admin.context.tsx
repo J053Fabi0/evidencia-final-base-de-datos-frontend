@@ -21,7 +21,7 @@ export function AdminProvider({ children }: { children: React.ReactNode | React.
   const navigate = useNavigate();
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const [admin, setAdmin] = useState<Admin | null>(
+  const [admin, setAdmin] = useState<Admin | null>(() =>
     queryParams.has("username") && queryParams.has("password")
       ? { username: queryParams.get("username") ?? "", password: queryParams.get("password") ?? "" }
       : null

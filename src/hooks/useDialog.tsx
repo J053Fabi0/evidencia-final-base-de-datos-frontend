@@ -57,7 +57,7 @@ export default function useDialog({
   const [stateActions, setActions] = useState(actions);
   const [stateContent, setContent] = useState(content);
   const [stateOkBtnText, setOkBtnText] = useState(okBtnText);
-  const [stateOnClose, setOnClose] = useState<() => typeof onClose>(() => onClose);
+  const [stateOnClose, setOnClose] = useState(() => () => onClose);
 
   const handleOnClose: () => void = () => void (setOpen(false), stateOnClose());
 

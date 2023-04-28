@@ -38,7 +38,7 @@ export default function Signin() {
     } catch (e: unknown) {
       if (isError(e) && e.message === "Request failed with status code 401")
         setError("Usuario o contraseña equivocada");
-      else showError(e);
+      else showError(e as Error);
       return false;
     }
 
