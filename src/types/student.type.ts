@@ -1,6 +1,6 @@
 import Status from "./status.type";
 
-type Student = {
+interface Student {
   id: string;
   name: string;
   status: Status;
@@ -10,7 +10,7 @@ type Student = {
   birthDate: Date;
   secondName: string;
   direction?: string;
-};
+}
 
 export type StudentRaw = Omit<Student, "birthDate"> & { birthDate: string };
 

@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import { Box, CircularProgress, LinearProgress, Typography } from "@mui/material";
+import http from "../../http-common";
+import { useEffect, useState } from "react";
+import Career from "../../types/career.type";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../../context/admin.context";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { setAdminParams } from "../../utils/setAdminParams";
+import { CircularProgress, Typography } from "@mui/material";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import Student, { StudentRaw } from "../../types/student.type";
-import http from "../../http-common";
 
 const currentYear = new Date().getFullYear();
 
@@ -17,6 +18,14 @@ const columns: GridColDef[] = [
   { field: "career", headerName: "Carrera", width: 300 },
 ];
 
+interface Row {
+  id: Student["id"];
+  name: string;
+  status: string;
+  years: number;
+  career: string;
+}
+
 export default function Home() {
   const admin = useAdmin();
   useRedirectIfTrue(admin === null, "/signin");
@@ -24,28 +33,32 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
 
   useEffect(() => {
     (async () => {
+      // Simulate loading for 1 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const { data } = await http.get<{ message: StudentRaw[] }>("/students");
-      setStudents(data.message.map(({ birthDate, ...s }) => ({ birthDate: new Date(birthDate), ...s })));
+
+      // Get the data
+      const { message: students } = (await http.get<{ message: StudentRaw[] }>("/students")).data;
+      const { message: careers } = (await http.get<{ message: Career[] }>("/careers")).data;
+
+      // Set the rows
+      setRows(
+        students.map((s) => ({
+          id: s.id,
+          name: `${s.name} ${s.secondName}`,
+          years: currentYear - new Date(s.birthDate).getFullYear(),
+          status: s.status.slice(0, 1).toUpperCase() + s.status.slice(1),
+          career: careers.find((c) => c.id === s.career)?.name ?? "No encontrada",
+        }))
+      );
+
+      // Stop loading
       setLoading(false);
     })();
   }, []);
-
-  const rows = useMemo(
-    () =>
-      students.map((s) => ({
-        id: s.id,
-        career: s.career,
-        name: `${s.name} ${s.secondName}`,
-        years: currentYear - s.birthDate.getFullYear(),
-        status: s.status.slice(0, 1).toUpperCase() + s.status.slice(1),
-      })),
-    [students]
-  );
 
   const onCellClick = (id: Student["id"]) => navigate(setAdminParams(id, admin));
 
