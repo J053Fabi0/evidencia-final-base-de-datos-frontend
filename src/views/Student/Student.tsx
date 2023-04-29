@@ -74,8 +74,12 @@ export default function Student() {
     useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
 
   const [error, setError] = useState<string | null>(null);
-  const { Dialog: TextDialog, setOpen: setTextDialogOpen } = useTextDialog({
-    title: "Guardado con éxito",
+  const {
+    Dialog: TextDialog,
+    setOpen: setTextDialogOpen,
+    setTitle: setTextDialogTitle,
+  } = useTextDialog({
+    title: "",
     content: null,
   });
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
@@ -119,15 +123,18 @@ export default function Student() {
         const { status } = await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
         if (status === 200) {
           await reloadStudents();
+          setTextDialogTitle("Guardado exitosamente");
           setTextDialogOpen(true);
         } else if (status === 401) navigate("/signin");
       }
       // registering student
       else {
-        const { status } = await http.post("/student", values);
+        const { status, data } = await http.post<{ message: string }>("/student", values);
         if (status === 200) {
           await reloadStudents();
-          navigate(setAdminParams("/", admin));
+          setTextDialogTitle("Registrado exitosamente");
+          setTextDialogOpen(true);
+          navigate(setAdminParams("/student/" + data.message, admin));
         } else if (status === 401) navigate("/signin");
       }
     } catch (e: unknown) {
