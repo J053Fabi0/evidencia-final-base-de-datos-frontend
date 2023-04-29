@@ -22,6 +22,7 @@ import { isServerError } from "../../types/serverError.type";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReloadStudents, useStudents } from "../../context/students.context";
 import { Box, Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
+import useTextDialog from "../../hooks/useTextDialog";
 
 const minYears = 18;
 const maxYears = 35;
@@ -62,6 +63,10 @@ export default function Student() {
     useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
 
   const [error, setError] = useState<string | null>(null);
+  const { Dialog: TextDialog, setOpen: setTextDialogOpen } = useTextDialog({
+    title: "Guardado con éxito",
+    content: null,
+  });
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
   const schema = Yup.object().shape({
@@ -101,8 +106,10 @@ export default function Student() {
       // editiing student
       if (student) {
         const { status } = await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
-        if (status === 200) await reloadStudents();
-        else if (status === 401) navigate("/signin");
+        if (status === 200) {
+          await reloadStudents();
+          setTextDialogOpen(true);
+        } else if (status === 401) navigate("/signin");
       }
       // registering student
       else {
@@ -337,6 +344,7 @@ export default function Student() {
       </Formik>
 
       {ErrorDialog}
+      {TextDialog}
     </Paper>
   );
 }

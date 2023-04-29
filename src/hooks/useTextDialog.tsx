@@ -2,6 +2,15 @@ import useDialog from "./useDialog";
 import { useCallback } from "react";
 import { DialogContentText } from "@mui/material";
 
+interface Params {
+  title?: string;
+  content?: React.ReactNode | React.ReactNode[];
+  actions?: React.ReactNode | React.ReactNode[];
+  onClose?: () => void;
+  okBtnText?: string;
+  openDefault?: boolean;
+}
+
 export default function useTextDialog({
   title = "",
   content = "",
@@ -9,7 +18,7 @@ export default function useTextDialog({
   onClose = () => {},
   okBtnText = "Bien",
   openDefault = false,
-} = {}) {
+}: Params = {}) {
   const createContentElement = (content: React.ReactNode | React.ReactNode[]) => (
     <DialogContentText>{content}</DialogContentText>
   );
