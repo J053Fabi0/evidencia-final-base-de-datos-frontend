@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { useSignOut } from "../context/admin.context";
+import { useAdmin, useSignOut } from "../context/admin.context";
 import { AccountCircle, Add, School, Logout, Menu as MenuIcon } from "@mui/icons-material";
 
 import { Container, ListItemIcon, ListItemText } from "@mui/material";
 import { Typography, Menu, MenuItem, IconButton, Toolbar, AppBar, Box } from "@mui/material";
+import { Link } from "react-router-dom";
+import { setAdminParams } from "../utils/setAdminParams";
 
 type MenuAnchor = "user" | "menu";
 
 export default function Navbar() {
+  const admin = useAdmin();
   const [anchorEl, setAnchorEl] = useState<Record<MenuAnchor, (EventTarget & HTMLButtonElement) | null>>({
     user: null,
     menu: null,
@@ -40,7 +43,9 @@ export default function Navbar() {
               component="div"
               sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
             >
-              Estudiantes
+              <Link to={setAdminParams("/", admin)} style={{ textDecoration: "none", color: "inherit" }}>
+                Estudiantes
+              </Link>
             </Typography>
             <IconButton size="large" color="inherit" onClick={handleMenu("user")}>
               <AccountCircle />

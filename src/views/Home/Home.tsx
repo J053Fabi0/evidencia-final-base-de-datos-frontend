@@ -1,13 +1,14 @@
-import http from "../../http-common";
-import { useEffect, useState } from "react";
-import Career from "../../types/career.type";
+import { Typography } from "@mui/material";
+import Student from "../../types/student.type";
 import { useNavigate } from "react-router-dom";
+import { useLayoutEffect, useState } from "react";
 import { useAdmin } from "../../context/admin.context";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useCareers } from "../../context/careers.context";
 import { setAdminParams } from "../../utils/setAdminParams";
-import { CircularProgress, Typography } from "@mui/material";
+import { useStudents } from "../../context/students.context";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
-import Student, { StudentRaw } from "../../types/student.type";
+import { CenteredCircularProgress } from "../../components/Mixins";
 
 const currentYear = new Date().getFullYear();
 
@@ -31,36 +32,31 @@ export default function Home() {
   useRedirectIfTrue(admin === null, "/signin");
 
   const navigate = useNavigate();
+  const students = useStudents();
+  const careers = useCareers();
 
-  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Row[]>([]);
+  const loading = students === null || careers === null;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     (async () => {
-      // Simulate loading for 1 second
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // Get the data
-      const { message: students } = (await http.get<{ message: StudentRaw[] }>("/students")).data;
-      const { message: careers } = (await http.get<{ message: Career[] }>("/careers")).data;
 
       // Set the rows
-      setRows(
-        students.map((s) => ({
-          id: s.id,
-          name: `${s.name} ${s.secondName}`,
-          years: currentYear - new Date(s.birthDate).getFullYear(),
-          status: s.status.slice(0, 1).toUpperCase() + s.status.slice(1),
-          career: careers.find((c) => c.id === s.career)?.name ?? "No encontrada",
-        }))
-      );
-
-      // Stop loading
-      setLoading(false);
+      if (students !== null && careers !== null)
+        setRows(
+          students.map((s) => ({
+            id: s.id,
+            name: `${s.name} ${s.secondName}`,
+            years: currentYear - s.birthDate.getFullYear(),
+            status: s.status.slice(0, 1).toUpperCase() + s.status.slice(1),
+            career: careers.find((c) => c.id === s.career)?.name ?? "No encontrada",
+          }))
+        );
     })();
-  }, []);
+  }, [students, careers]);
 
-  const onCellClick = (id: Student["id"]) => navigate(setAdminParams(id, admin));
+  const onCellClick = (id: Student["id"]) => navigate(setAdminParams(`student/${id}`, admin));
 
   if (admin === null) return null;
   return (
@@ -68,16 +64,14 @@ export default function Home() {
       <Typography sx={{ my: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
 
       {loading ? (
-        <CircularProgress
-          sx={{ top: "50%", left: "50%", position: "absolute", transform: "translate(-50%, -50%)" }}
-        />
+        <CenteredCircularProgress />
       ) : (
         <DataGrid
           rows={rows}
           columns={columns}
-          paginationModel={{ page: 0, pageSize: 20 }}
+          paginationModel={{ page: 0, pageSize: 9 }}
           onCellClick={(params) => {
-            if (params.field === "name") onCellClick(params.id as Student["id"]);
+            onCellClick(params.id as Student["id"]);
           }}
         />
       )}
