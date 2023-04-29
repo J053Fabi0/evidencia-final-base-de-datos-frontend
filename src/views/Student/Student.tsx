@@ -171,6 +171,7 @@ export default function Student() {
                   <InputLabel
                     shrink
                     required
+                    disabled={isSubmitting}
                     sx={{ backgroundColor: "white", px: 1 }}
                     error={hasError("birthDate", touched, errors, submitCount)}
                   >
@@ -200,13 +201,31 @@ export default function Student() {
                     value={values.career}
                     disabled={isSubmitting}
                     labelId="career-select"
-                    onChange={(e) => {
-                      handleChange({ target: { id: "career", value: e.target.value } });
-                    }}
+                    onChange={(e) => handleChange({ target: { id: "career", value: e.target.value } })}
                   >
                     {careers.map((c) => (
                       <MenuItem key={c.id} value={c.id}>
                         {c.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Status */}
+              <Grid item {...spacerFor2}>
+                <FormControl fullWidth required>
+                  <InputLabel id="status-select">Status</InputLabel>
+                  <Select
+                    label="Estado"
+                    value={values.status}
+                    disabled={isSubmitting}
+                    labelId="status-select"
+                    onChange={(e) => handleChange({ target: { id: "status", value: e.target.value } })}
+                  >
+                    {statuses.map((s) => (
+                      <MenuItem key={s} value={s}>
+                        {s.slice(0, 1).toUpperCase() + s.slice(1)}
                       </MenuItem>
                     ))}
                   </Select>
