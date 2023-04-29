@@ -1,8 +1,11 @@
 import * as Yup from "yup";
 import { useState } from "react";
+import "../../css/DatePicker.css";
 import http from "../../http-common";
 import { LoadingButton } from "@mui/lab";
+import "react-calendar/dist/Calendar.css";
 import isError from "../../utils/isError";
+import DatePicker from "react-date-picker";
 import hasError from "../../utils/hasError";
 import { useParams } from "react-router-dom";
 import { Formik, Form as FormikForm } from "formik";
@@ -10,7 +13,14 @@ import useErrorDialog from "../../hooks/useErrorDialog";
 import { useCareers } from "../../context/careers.context";
 import { useStudents } from "../../context/students.context";
 import { CenteredBox, CenteredCircularProgress, FormikSimpleTextField } from "../../components/Mixins";
-import { Alert, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Typography } from "@mui/material";
+import { Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
+
+const minYears = 18;
+const maxYears = 35;
+const maxDate = new Date();
+maxDate.setFullYear(maxDate.getFullYear() - minYears);
+const minDate = new Date();
+minDate.setFullYear(minDate.getFullYear() - maxYears);
 
 interface Schema {
   name: string;
@@ -67,7 +77,6 @@ export default function Student() {
       else showError(e as Error);
       return false;
     }
-
     return true;
   };
 
@@ -159,7 +168,19 @@ export default function Student() {
               </Grid>
 
               {/* Birthday */}
-              <Grid item xs={12} md={6}></Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  locale="es-ES"
+                  clearIcon={null}
+                  format="dd/MMM/y"
+                  maxDate={maxDate}
+                  minDate={minDate}
+                  disabled={isSubmitting}
+                  value={values.birthDate}
+                  onCalendarClose={() => handleBlur({ target: { id: "birthDate" } })}
+                  onChange={(v) => handleChange({ target: { id: "birthDate", value: v } })}
+                />
+              </Grid>
             </Grid>
 
             <CenteredBox sx={{ mt: 3 }}>
