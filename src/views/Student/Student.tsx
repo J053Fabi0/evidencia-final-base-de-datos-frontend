@@ -15,11 +15,11 @@ import { statuses } from "../../types/status.type";
 import { Formik, Form as FormikForm } from "formik";
 import { useAdmin } from "../../context/admin.context";
 import useErrorDialog from "../../hooks/useErrorDialog";
-import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCareers } from "../../context/careers.context";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { isServerError } from "../../types/serverError.type";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReloadStudents, useStudents } from "../../context/students.context";
 import { Box, Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
 
@@ -77,20 +77,23 @@ export default function Student() {
     phone: Yup.string().max(20, "Máximo 20 caracteres."),
   });
 
-  const defaultValues: Schema = {
-    name: (student && student.name) ?? "",
-    email: (student && student.email) ?? "",
-    phone: (student && student.phone) ?? "",
-    direction: (student && student.direction) ?? "",
-    secondName: (student && student.secondName) ?? "",
-    status: (student && student.status) ?? "inscrito",
-    birthDate: (student && student.birthDate) || maxDate,
-    career: (careers && student && student.career) ?? careers?.[0].id ?? "",
-  };
+  const defaultValues: Schema = useMemo(
+    () => ({
+      name: (student && student.name) ?? "",
+      email: (student && student.email) ?? "",
+      phone: (student && student.phone) ?? "",
+      direction: (student && student.direction) ?? "",
+      secondName: (student && student.secondName) ?? "",
+      status: (student && student.status) ?? "inscrito",
+      birthDate: (student && student.birthDate) || maxDate,
+      career: (careers && student && student.career) ?? careers?.[0].id ?? "",
+    }),
+    [student, careers]
+  );
 
   useLayoutEffect(() => {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
-  }, [student]);
+  }, [student, defaultValues]);
 
   const handleOnSubmit = async (values: Schema) => {
     setError(null);
