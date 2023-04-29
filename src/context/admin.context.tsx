@@ -33,7 +33,6 @@ export function AdminProvider({ children }: { children: React.ReactNode | React.
       config.params = config.params || {};
       config.params.username = admin ? admin.username : config.params.username;
       config.params.password = admin ? admin.password : config.params.password;
-      console.log(config.params);
       return config;
     });
 
