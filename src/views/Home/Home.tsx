@@ -3,12 +3,12 @@ import Student from "../../types/student.type";
 import { useNavigate } from "react-router-dom";
 import { useLayoutEffect, useState } from "react";
 import { useAdmin } from "../../context/admin.context";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useCareers } from "../../context/careers.context";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { useStudents } from "../../context/students.context";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { CenteredCircularProgress } from "../../components/Mixins";
+import { DataGrid, GridColDef, GridPagination } from "@mui/x-data-grid";
 
 const currentYear = new Date().getFullYear();
 
@@ -26,6 +26,8 @@ interface Row {
   years: number;
   career: string;
 }
+
+const pageSize = 9;
 
 export default function Home() {
   const admin = useAdmin();
@@ -56,7 +58,9 @@ export default function Home() {
     })();
   }, [students, careers]);
 
-  const onCellClick = (id: Student["id"]) => navigate(setAdminParams(`student/${id}`, admin));
+  const onCellClick = (id: Student["id"]) => {
+    if (students && students.find((s) => s.id === id)) navigate(setAdminParams(`student/${id}`, admin));
+  };
 
   if (admin === null) return null;
   return (
@@ -67,12 +71,13 @@ export default function Home() {
         <CenteredCircularProgress />
       ) : (
         <DataGrid
+          pagination
           rows={rows}
           columns={columns}
-          paginationModel={{ page: 0, pageSize: 9 }}
-          onCellClick={(params) => {
-            onCellClick(params.id as Student["id"]);
-          }}
+          rowSelection={false}
+          slots={{ pagination: GridPagination }}
+          onRowClick={(params) => onCellClick(params.id as Student["id"])}
+          initialState={{ pagination: { paginationModel: { pageSize } } }}
         />
       )}
     </>
