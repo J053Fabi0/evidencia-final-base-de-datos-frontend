@@ -1,9 +1,9 @@
 import { Typography } from "@mui/material";
 import Student from "../../types/student.type";
-import { useNavigate } from "react-router-dom";
 import { useLayoutEffect, useState } from "react";
 import { useAdmin } from "../../context/admin.context";
 import { useCareers } from "../../context/careers.context";
+import { useLocation, useNavigate } from "react-router-dom";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { useStudents } from "../../context/students.context";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
@@ -36,7 +36,10 @@ export default function Home() {
   const navigate = useNavigate();
   const students = useStudents();
   const careers = useCareers();
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
 
+  const page = (parseInt(queryParams.get("page") ?? "1") || 1) - 1;
   const [rows, setRows] = useState<Row[]>([]);
   const loading = students === null || careers === null;
 
@@ -74,10 +77,18 @@ export default function Home() {
           pagination
           rows={rows}
           columns={columns}
+          onPaginationModelChange={(params) => {
+            // navigate(setAdminParams("", admin, { page: params.page.toString() }));
+            // set the page param in the url without changing the current params
+            // and without using navigate
+            if (params.page === 0) queryParams.delete("page");
+            else queryParams.set("page", (params.page + 1).toString());
+            navigate({ search: queryParams.toString() }, { replace: true });
+          }}
           rowSelection={false}
           slots={{ pagination: GridPagination }}
           onRowClick={(params) => onCellClick(params.id as Student["id"])}
-          initialState={{ pagination: { paginationModel: { pageSize } } }}
+          initialState={{ pagination: { paginationModel: { pageSize, page } } }}
         />
       )}
     </>

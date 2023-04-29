@@ -134,7 +134,7 @@ export default function Student() {
           await reloadStudents();
           setTextDialogTitle("Registrado exitosamente");
           setTextDialogOpen(true);
-          navigate(setAdminParams("/student/" + data.message, admin));
+          navigate(setAdminParams(`/student/${data.message}`, admin));
         } else if (status === 401) navigate("/signin");
       }
     } catch (e: unknown) {
