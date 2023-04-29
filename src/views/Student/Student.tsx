@@ -80,6 +80,9 @@ export default function Student() {
     return true;
   };
 
+  const spacerFor3 = { xs: 12, md: 4 };
+  const spacerFor2 = { xs: 12, md: 6 };
+
   if (loading) return <CenteredCircularProgress />;
   if (!student && id) return <Typography variant="h2">Estudiante no encontrado</Typography>;
   return (
@@ -117,7 +120,7 @@ export default function Student() {
             )}
 
             <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+              <Grid item {...spacerFor3}>
                 {/* Name */}
                 <FormikSimpleTextField
                   id="name"
@@ -131,7 +134,7 @@ export default function Student() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item {...spacerFor3}>
                 {/* Second name */}
                 <FormikSimpleTextField
                   id="secondName"
@@ -145,7 +148,22 @@ export default function Student() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              {/* Birthday */}
+              <Grid sx={{ mt: 3 }} item {...spacerFor3}>
+                <DatePicker
+                  locale="es-ES"
+                  clearIcon={null}
+                  format="dd/MMM/y"
+                  maxDate={maxDate}
+                  minDate={minDate}
+                  disabled={isSubmitting}
+                  value={values.birthDate}
+                  onCalendarClose={() => handleBlur({ target: { id: "birthDate" } })}
+                  onChange={(v) => handleChange({ target: { id: "birthDate", value: v } })}
+                />
+              </Grid>
+
+              <Grid item {...spacerFor2}>
                 {/* Career */}
                 <FormControl fullWidth>
                   <InputLabel id="career-select">Carrera</InputLabel>
@@ -165,21 +183,6 @@ export default function Student() {
                     ))}
                   </Select>
                 </FormControl>
-              </Grid>
-
-              {/* Birthday */}
-              <Grid item xs={12} md={6}>
-                <DatePicker
-                  locale="es-ES"
-                  clearIcon={null}
-                  format="dd/MMM/y"
-                  maxDate={maxDate}
-                  minDate={minDate}
-                  disabled={isSubmitting}
-                  value={values.birthDate}
-                  onCalendarClose={() => handleBlur({ target: { id: "birthDate" } })}
-                  onChange={(v) => handleChange({ target: { id: "birthDate", value: v } })}
-                />
               </Grid>
             </Grid>
 
