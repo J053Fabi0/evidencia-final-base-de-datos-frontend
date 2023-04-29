@@ -1,25 +1,36 @@
 import { useState } from "react";
 import { useSignOut } from "../context/admin.context";
-import { AccountCircle, Menu as MenuIcon } from "@mui/icons-material";
+import { AccountCircle, Add, School, Logout, Menu as MenuIcon } from "@mui/icons-material";
 
-import { Container } from "@mui/material";
+import { Container, ListItemIcon, ListItemText } from "@mui/material";
 import { Typography, Menu, MenuItem, IconButton, Toolbar, AppBar, Box } from "@mui/material";
 
+type MenuAnchor = "user" | "menu";
+
 export default function Navbar() {
-  const [anchorEl, setAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null);
+  const [anchorEl, setAnchorEl] = useState<Record<MenuAnchor, (EventTarget & HTMLButtonElement) | null>>({
+    user: null,
+    menu: null,
+  });
   const signOut = useSignOut();
 
-  const handleClose = () => setAnchorEl(null);
-  function handleMenu(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    return setAnchorEl(event.currentTarget);
-  }
+  const handleClose = (menuAnchor: MenuAnchor) => () => setAnchorEl({ ...anchorEl, [menuAnchor]: null });
+  const handleMenu = (menuAnchor: MenuAnchor) => (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
+    setAnchorEl({ ...anchorEl, [menuAnchor]: event.currentTarget });
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Container>
           <Toolbar>
-            <IconButton size="large" edge="start" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}>
+            <IconButton
+              onClick={handleMenu("menu")}
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              sx={{ mr: 2 }}
+            >
               <MenuIcon />
             </IconButton>
 
@@ -31,20 +42,48 @@ export default function Navbar() {
             >
               Estudiantes
             </Typography>
-            <IconButton size="large" color="inherit" onClick={handleMenu}>
+            <IconButton size="large" color="inherit" onClick={handleMenu("user")}>
               <AccountCircle />
             </IconButton>
 
             <Menu
               keepMounted
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              open={Boolean(anchorEl)}
+              id="user-appbar"
+              anchorEl={anchorEl.user}
+              onClose={handleClose("user")}
+              open={Boolean(anchorEl.user)}
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-              <MenuItem onClick={signOut}>Cerrar sesión</MenuItem>
+              <MenuItem onClick={signOut}>
+                <ListItemIcon>
+                  <Logout />
+                </ListItemIcon>
+                <ListItemText>Cerrar sesión</ListItemText>
+              </MenuItem>
+            </Menu>
+
+            <Menu
+              keepMounted
+              id="menu-appbar"
+              anchorEl={anchorEl.menu}
+              onClose={handleClose("menu")}
+              open={Boolean(anchorEl.menu)}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <MenuItem onClick={handleClose("menu")}>
+                <ListItemIcon>
+                  <Add />
+                </ListItemIcon>
+                <ListItemText>Registrar estudiante</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={handleClose("menu")}>
+                <ListItemIcon>
+                  <School />
+                </ListItemIcon>
+                <ListItemText>Crear carrera</ListItemText>
+              </MenuItem>
             </Menu>
           </Toolbar>
         </Container>

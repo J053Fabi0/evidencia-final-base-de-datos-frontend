@@ -1,43 +1,88 @@
-import { Typography, Grid } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../../context/admin.context";
-import StudentCard from "../../components/StudentCard";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { setAdminParams } from "../../utils/setAdminParams";
+import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import Student, { StudentRaw } from "../../types/student.type";
 
-const restaurants = [
+const studentsRawTest: StudentRaw[] = [
   {
-    title: "Tim Hortons",
-    image: "https://i.pinimg.com/originals/57/6c/c4/576cc471c87ab79be68234fb15911c30.jpg",
-    description: "Galletas muy ricas.",
-    id: "tim",
+    name: "Jose Fabio",
+    status: "inscrito",
+    secondName: "Argüello Loya",
+    id: "644c214c5ac68ce59fc15b5b",
+    career: "644c104a4031f55e67ed8daa",
+    birthDate: "2001-01-01T00:00:00.000Z",
   },
   {
-    title: "Subway",
-    image:
-      "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.schoolphotoproject.com%2F_picture-of-logos-brands%2Fsubway-logo-photo2-l.jpg&f=1&nofb=1&ipt=52ea3323ff5bb17f79ad5efa478742081d0d309e434d44b48c5efc925bd35966&ipo=images",
-    description: "Uno del día sin carne mejor que vegetariano.",
-    id: "subway",
+    name: "Andrea",
+    status: "inscrito",
+    secondName: "González",
+    id: "644c214c5ac68ce59fc15b5c",
+    career: "644c104a4031f55e67ed8daa",
+    birthDate: "2001-01-01T00:00:00.000Z",
   },
   {
-    title: "Ji Xiang",
-    image: "https://jixiangconfectionery.com.sg/wp-content/uploads/2021/01/jixiang-2021-new-logo.png",
-    description: "Comida china.",
-    id: "ji",
+    name: "Juan",
+    status: "inscrito",
+    secondName: "Pérez",
+    id: "644c214c5ac68ce59fc15b5d",
+    career: "644c104a4031f55e67ed8daa",
+    birthDate: "2001-01-01T00:00:00.000Z",
   },
+];
+
+const currentYear = new Date().getFullYear();
+
+const columns: GridColDef[] = [
+  { field: "name", headerName: "Nombre", width: 300 },
+  { field: "status", headerName: "Estatus", width: 150 },
+  { field: "years", headerName: "Años" },
+  { field: "career", headerName: "Carrera", width: 300 },
 ];
 
 export default function Home() {
   const admin = useAdmin();
+  useRedirectIfTrue(admin === null, "/signin");
 
-  return admin ? (
+  const navigate = useNavigate();
+
+  const [studentsRaw] = useState<StudentRaw[]>(studentsRawTest);
+
+  const students: Student[] = useMemo(
+    () => studentsRaw.map(({ birthDate, ...s }) => ({ birthDate: new Date(birthDate), ...s })),
+    [studentsRaw]
+  );
+
+  const rows = useMemo(
+    () =>
+      students.map((s) => ({
+        id: s.id,
+        career: s.career,
+        name: `${s.name} ${s.secondName}`,
+        years: currentYear - s.birthDate.getFullYear(),
+        status: s.status.slice(0, 1).toUpperCase() + s.status.slice(1),
+      })),
+    [students]
+  );
+
+  const onCellClick = (id: Student["id"]) => navigate(setAdminParams(id, admin));
+
+  if (admin === null) return null;
+  return (
     <>
-      <Typography sx={{ mt: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
+      <Typography sx={{ my: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
 
-      <Grid container spacing={2}>
-        {restaurants.map(({ title, description, image, id }) => (
-          <Grid item xs={12} md={6} lg={4}>
-            <StudentCard image={image} title={title} description={description} id={id} />
-          </Grid>
-        ))}
-      </Grid>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        paginationModel={{ page: 0, pageSize: 20 }}
+        onCellClick={(params) => {
+          if (params.field === "name") onCellClick(params.id as Student["id"]);
+        }}
+      />
     </>
-  ) : null;
+  );
 }

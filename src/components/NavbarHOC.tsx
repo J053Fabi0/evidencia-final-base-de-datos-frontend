@@ -1,8 +1,7 @@
 import Navbar from "./Navbar";
-import BottomBar from "./Bottombar";
 import { Container } from "@mui/material";
 
-export default function NavbarAndBottombar(Component: () => JSX.Element | null) {
+export default function NavbarHOC(Component: () => JSX.Element | null) {
   return (
     <>
       <Navbar />
@@ -10,8 +9,6 @@ export default function NavbarAndBottombar(Component: () => JSX.Element | null) 
       <Container>
         <Component />
       </Container>
-
-      <BottomBar />
     </>
   );
 }

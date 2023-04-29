@@ -2,8 +2,8 @@ import Box from "@mui/material/Box";
 import useDialog from "./useDialog";
 import styled from "@emotion/styled";
 import Button from "@mui/material/Button";
-import stringifyError from "../utils/stringifyError";
 import Typography from "@mui/material/Typography";
+import stringifyError from "../utils/stringifyError";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const Code = styled(
