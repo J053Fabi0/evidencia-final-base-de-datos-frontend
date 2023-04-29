@@ -8,12 +8,25 @@ import isError from "../../utils/isError";
 import DatePicker from "react-date-picker";
 import hasError from "../../utils/hasError";
 import { useParams } from "react-router-dom";
+import { statuses } from "../../types/status.type";
 import { Formik, Form as FormikForm } from "formik";
 import useErrorDialog from "../../hooks/useErrorDialog";
 import { useCareers } from "../../context/careers.context";
 import { useStudents } from "../../context/students.context";
 import { CenteredBox, CenteredCircularProgress, FormikSimpleTextField } from "../../components/Mixins";
-import { Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
+import {
+  Grid,
+  Alert,
+  Paper,
+  Select,
+  MenuItem,
+  InputLabel,
+  Typography,
+  FormControl,
+  TextField,
+  Box,
+  Input,
+} from "@mui/material";
 
 const minYears = 18;
 const maxYears = 35;
@@ -44,14 +57,16 @@ export default function Student() {
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
   const schema = Yup.object().shape({
-    direction: Yup.string(),
+    // required
     name: Yup.string().required("Requerido."),
     career: Yup.string().required("Requerido."),
-    birthDate: Yup.date().required("Requerido."),
-    email: Yup.string().email("Correo inválido."),
     secondName: Yup.string().required("Requerido."),
+    birthDate: Yup.date().max(maxDate).min(minDate).required("Requerido."),
+    status: Yup.string().oneOf(statuses).required("Requerido."),
+    // optional
+    direction: Yup.string(),
+    email: Yup.string().email("Correo inválido."),
     phone: Yup.string().matches(/^\d{10}$/, "Teléfono inválido."),
-    status: Yup.string().oneOf(["inscrito", "no inscrito"]).required("Requerido."),
   });
 
   const defaultValues: Schema = {
@@ -120,9 +135,10 @@ export default function Student() {
             )}
 
             <Grid container spacing={2}>
+              {/* Name */}
               <Grid item {...spacerFor3}>
-                {/* Name */}
                 <FormikSimpleTextField
+                  required
                   id="name"
                   label="Nombre"
                   onBlur={handleBlur}
@@ -134,9 +150,10 @@ export default function Student() {
                 />
               </Grid>
 
+              {/* Second name */}
               <Grid item {...spacerFor3}>
-                {/* Second name */}
                 <FormikSimpleTextField
+                  required
                   id="secondName"
                   label="Apellidos"
                   onBlur={handleBlur}
@@ -150,22 +167,33 @@ export default function Student() {
 
               {/* Birthday */}
               <Grid sx={{ mt: 3 }} item {...spacerFor3}>
-                <DatePicker
-                  locale="es-ES"
-                  clearIcon={null}
-                  format="dd/MMM/y"
-                  maxDate={maxDate}
-                  minDate={minDate}
-                  disabled={isSubmitting}
-                  value={values.birthDate}
-                  onCalendarClose={() => handleBlur({ target: { id: "birthDate" } })}
-                  onChange={(v) => handleChange({ target: { id: "birthDate", value: v } })}
-                />
+                <Box component={FormControl} fullWidth>
+                  <InputLabel
+                    shrink
+                    required
+                    sx={{ backgroundColor: "white", px: 1 }}
+                    error={hasError("birthDate", touched, errors, submitCount)}
+                  >
+                    Fecha de nacimiento
+                  </InputLabel>
+                  <DatePicker
+                    required
+                    locale="es-ES"
+                    clearIcon={null}
+                    format="dd/MMM/y"
+                    maxDate={maxDate}
+                    minDate={minDate}
+                    disabled={isSubmitting}
+                    value={values.birthDate}
+                    onCalendarClose={() => handleBlur({ target: { id: "birthDate" } })}
+                    onChange={(v) => handleChange({ target: { id: "birthDate", value: v } })}
+                  />
+                </Box>
               </Grid>
 
+              {/* Career */}
               <Grid item {...spacerFor2}>
-                {/* Career */}
-                <FormControl fullWidth>
+                <FormControl fullWidth required>
                   <InputLabel id="career-select">Carrera</InputLabel>
                   <Select
                     label="Carrera"
