@@ -14,19 +14,7 @@ import useErrorDialog from "../../hooks/useErrorDialog";
 import { useCareers } from "../../context/careers.context";
 import { useStudents } from "../../context/students.context";
 import { CenteredBox, CenteredCircularProgress, FormikSimpleTextField } from "../../components/Mixins";
-import {
-  Grid,
-  Alert,
-  Paper,
-  Select,
-  MenuItem,
-  InputLabel,
-  Typography,
-  FormControl,
-  TextField,
-  Box,
-  Input,
-} from "@mui/material";
+import { Box, Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
 
 const minYears = 18;
 const maxYears = 35;
@@ -76,7 +64,7 @@ export default function Student() {
     direction: student ? student.direction : "",
     secondName: student ? student.secondName : "",
     status: student ? student.status : "inscrito",
-    birthDate: (student && student.birthDate) ?? new Date(),
+    birthDate: (student && student.birthDate) || maxDate,
     career: careers && student ? student.career : careers?.[0].id ?? "",
   };
 
