@@ -14,6 +14,11 @@ export const CenteredBox = styled(Box)`
   flex-direction: column;
 `;
 
+export const CenteredHorizontalBox = styled(Box)`
+  display: flex;
+  justify-content: center;
+`;
+
 type TextFieldProps = React.ComponentProps<typeof TextField>;
 
 export function FormikSimpleTextField({

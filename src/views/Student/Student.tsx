@@ -13,7 +13,12 @@ import { Formik, Form as FormikForm } from "formik";
 import useErrorDialog from "../../hooks/useErrorDialog";
 import { useCareers } from "../../context/careers.context";
 import { useStudents } from "../../context/students.context";
-import { CenteredBox, CenteredCircularProgress, FormikSimpleTextField } from "../../components/Mixins";
+import {
+  CenteredBox,
+  CenteredCircularProgress,
+  CenteredHorizontalBox,
+  FormikSimpleTextField,
+} from "../../components/Mixins";
 import { Box, Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
 
 const minYears = 18;
@@ -85,6 +90,7 @@ export default function Student() {
 
   const spacerFor3 = { xs: 12, md: 4 };
   const spacerFor2 = { xs: 12, md: 6 };
+  const spacerFor1 = { xs: 12 };
 
   if (loading) return <CenteredCircularProgress />;
   if (!student && id) return <Typography variant="h2">Estudiante no encontrado</Typography>;
@@ -181,7 +187,7 @@ export default function Student() {
               </Grid>
 
               {/* Career */}
-              <Grid item {...spacerFor2}>
+              <Grid item {...spacerFor2} mt={3}>
                 <FormControl fullWidth required>
                   <InputLabel id="career-select">Carrera</InputLabel>
                   <Select
@@ -201,7 +207,7 @@ export default function Student() {
               </Grid>
 
               {/* Status */}
-              <Grid item {...spacerFor2}>
+              <Grid item {...spacerFor2} mt={3}>
                 <FormControl fullWidth required>
                   <InputLabel id="status-select">Status</InputLabel>
                   <Select
@@ -218,6 +224,56 @@ export default function Student() {
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+
+              <Grid item mt={3} {...spacerFor1}>
+                <CenteredHorizontalBox>
+                  <Typography variant="h5">Datos opcionales</Typography>
+                </CenteredHorizontalBox>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2}>
+              {/* Email */}
+              <Grid item {...spacerFor2}>
+                <FormikSimpleTextField
+                  id="email"
+                  onBlur={handleBlur}
+                  value={values.email}
+                  disabled={isSubmitting}
+                  onChange={handleChange}
+                  errorName={errors.email}
+                  label="Correo electrónico"
+                  hasError={hasError("email", touched, errors, submitCount)}
+                />
+              </Grid>
+
+              {/* Phone */}
+              <Grid item {...spacerFor2}>
+                <FormikSimpleTextField
+                  id="phone"
+                  label="Teléfono"
+                  onBlur={handleBlur}
+                  value={values.phone}
+                  disabled={isSubmitting}
+                  onChange={handleChange}
+                  errorName={errors.phone}
+                  hasError={hasError("phone", touched, errors, submitCount)}
+                />
+              </Grid>
+
+              {/* Direction */}
+              <Grid item {...spacerFor1}>
+                <FormikSimpleTextField
+                  id="direction"
+                  label="Dirección"
+                  onBlur={handleBlur}
+                  value={values.direction}
+                  disabled={isSubmitting}
+                  onChange={handleChange}
+                  errorName={errors.direction}
+                  hasError={hasError("direction", touched, errors, submitCount)}
+                />
               </Grid>
             </Grid>
 
