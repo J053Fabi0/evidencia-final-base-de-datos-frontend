@@ -11,8 +11,7 @@
 }
 
 .react-date-picker--disabled {
-  background-color: #f0f0f0;
-  color: #6d6d6d;
+  color: rgba(0, 0, 0, 0.38);
 }
 
 .react-date-picker__wrapper {
@@ -65,9 +64,9 @@
   margin: 0;
 }
 
-.react-date-picker__inputGroup__input:invalid {
+/* .react-date-picker__inputGroup__input:invalid {
   background: rgba(255, 0, 0, 0.1);
-}
+} */
 
 .react-date-picker__inputGroup__input--hasLeadingZero {
   margin-left: -0.54em;
