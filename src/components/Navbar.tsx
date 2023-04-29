@@ -77,12 +77,14 @@ export default function Navbar() {
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-              <MenuItem onClick={handleClose("menu")}>
-                <ListItemIcon>
-                  <Add />
-                </ListItemIcon>
-                <ListItemText>Registrar estudiante</ListItemText>
-              </MenuItem>
+              <Link to={setAdminParams("/student", admin)} style={{ textDecoration: "none", color: "inherit" }}>
+                <MenuItem onClick={handleClose("menu")}>
+                  <ListItemIcon>
+                    <Add />
+                  </ListItemIcon>
+                  <ListItemText>Registrar estudiante</ListItemText>
+                </MenuItem>
+              </Link>
               <MenuItem onClick={handleClose("menu")}>
                 <ListItemIcon>
                   <School />

@@ -21,7 +21,18 @@ import { setAdminParams } from "../../utils/setAdminParams";
 import { isServerError } from "../../types/serverError.type";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReloadStudents, useStudents } from "../../context/students.context";
-import { Box, Grid, Alert, Paper, Select, MenuItem, InputLabel, Typography, FormControl } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Alert,
+  Paper,
+  Select,
+  MenuItem,
+  InputLabel,
+  Typography,
+  FormControl,
+  FormHelperText,
+} from "@mui/material";
 import useTextDialog from "../../hooks/useTextDialog";
 
 const minYears = 18;
@@ -89,9 +100,9 @@ export default function Student() {
       phone: (student && student.phone) ?? "",
       direction: (student && student.direction) ?? "",
       secondName: (student && student.secondName) ?? "",
-      status: (student && student.status) ?? "inscrito",
-      birthDate: (student && student.birthDate) || maxDate,
-      career: (careers && student && student.career) ?? careers?.[0].id ?? "",
+      birthDate: (student && student.birthDate) ?? maxDate,
+      career: (careers && student && student.career) ?? "",
+      status: (student && student.status) ?? ("" as "inscrito"),
     }),
     [student, careers]
   );
@@ -160,6 +171,7 @@ export default function Student() {
           submitForm,
           handleBlur,
           submitCount,
+          isValid,
           isSubmitting,
           handleSubmit,
           handleChange,
@@ -236,13 +248,15 @@ export default function Student() {
 
                 {/* Career */}
                 <Grid item {...spacerFor2} mt={3}>
-                  <FormControl fullWidth required>
+                  <FormControl fullWidth required error={hasError("career", touched, errors, submitCount)}>
                     <InputLabel id="career-select">Carrera</InputLabel>
                     <Select
                       label="Carrera"
                       value={values.career}
                       disabled={isSubmitting}
                       labelId="career-select"
+                      onBlur={() => handleBlur({ target: { id: "career" } })}
+                      error={hasError("career", touched, errors, submitCount)}
                       onChange={(e) => handleChange({ target: { id: "career", value: e.target.value } })}
                     >
                       {careers.map((c) => (
@@ -251,18 +265,23 @@ export default function Student() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <FormHelperText>
+                      {(hasError("career", touched, errors, submitCount) && errors.career) || ""}
+                    </FormHelperText>
                   </FormControl>
                 </Grid>
 
                 {/* Status */}
                 <Grid item {...spacerFor2} mt={3}>
-                  <FormControl fullWidth required>
+                  <FormControl fullWidth required error={hasError("status", touched, errors, submitCount)}>
                     <InputLabel id="status-select">Status</InputLabel>
                     <Select
                       label="Estado"
                       value={values.status}
                       disabled={isSubmitting}
                       labelId="status-select"
+                      onBlur={() => handleBlur({ target: { id: "status" } })}
+                      error={hasError("status", touched, errors, submitCount)}
                       onChange={(e) => handleChange({ target: { id: "status", value: e.target.value } })}
                     >
                       {statuses.map((s) => (
@@ -271,6 +290,9 @@ export default function Student() {
                         </MenuItem>
                       ))}
                     </Select>
+                    <FormHelperText>
+                      {(hasError("status", touched, errors, submitCount) && errors.status) || ""}
+                    </FormHelperText>
                   </FormControl>
                 </Grid>
 
@@ -330,10 +352,11 @@ export default function Student() {
                   variant="contained"
                   onClick={submitForm}
                   loading={isSubmitting}
-                  disabled={(() => {
-                    console.log(getValuesToPatch(values, defaultValues));
-                    return Object.keys(getValuesToPatch(values, defaultValues)).length === 0;
-                  })()}
+                  disabled={
+                    student
+                      ? Object.keys(getValuesToPatch(values, defaultValues)).length === 0
+                      : isSubmitting || !isValid
+                  }
                 >
                   Guardar
                 </LoadingButton>
