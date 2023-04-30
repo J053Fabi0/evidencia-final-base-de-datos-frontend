@@ -8,5 +8,5 @@ export interface Schema {
 
 export const schema = Yup.object().shape({
   // required
-  name: Yup.string().min(2, "Al menos 2 caracteres.").required("Requerido."),
+  name: Yup.string().min(2, "Al menos 2 caracteres.").max(80, "No más de 80 caracteres.").required("Requerido."),
 });

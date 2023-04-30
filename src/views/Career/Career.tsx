@@ -3,13 +3,13 @@ import http from "../../http-common";
 import { LoadingButton } from "@mui/lab";
 import hasError from "../../utils/hasError";
 import { School } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
 import useTextDialog from "../../hooks/useTextDialog";
 import { useAdmin } from "../../context/admin.context";
 import useErrorDialog from "../../hooks/useErrorDialog";
 import { Alert, Paper, Typography } from "@mui/material";
 import { setAdminParams } from "../../utils/setAdminParams";
+import { useLocation, useNavigate } from "react-router-dom";
 import { isServerError } from "../../types/serverError.type";
 import { defaultValues, schema, Schema } from "./careerUtils";
 import { Formik, Form as FormikForm, FormikProps } from "formik";
@@ -21,8 +21,10 @@ import { CenteredHorizontalBox, FormikSimpleTextField } from "../../components/M
 export default function Career() {
   const admin = useAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
   const reloadCareers = useReloadCareers();
   const dialog = useTextDialog({ content: null });
+  const creating = location.pathname === "/career/new";
   const [error, setError] = useState<string | null>(null);
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
@@ -38,11 +40,13 @@ export default function Career() {
   const handleOnSubmit = async (values: Schema) => {
     setError(null);
     try {
-      const { data } = await http.post<{ message: string }>("/career", values);
-      await reloadCareers();
-      dialog.setTitle("Registrado exitosamente");
-      dialog.setOpen(true);
-      navigate(setAdminParams(`/career/${data.message}`, admin));
+      if (creating) {
+        const { data } = await http.post<{ message: string }>("/career", values);
+        await reloadCareers();
+        dialog.setTitle("Registrado exitosamente");
+        dialog.setOpen(true);
+        navigate(setAdminParams(`/career/${data.message}`, admin));
+      }
     } catch (e: unknown) {
       if (isServerError(e)) {
         const error = e.response?.data.error;
