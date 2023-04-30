@@ -8,6 +8,7 @@ interface Student {
   email?: string;
   phone?: string;
   birthDate: Date;
+  createdAt: Date;
   secondName: string;
   direction?: string;
 }
