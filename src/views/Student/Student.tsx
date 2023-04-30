@@ -41,11 +41,11 @@ export default function Student() {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
   }, [student, defaultValues]);
 
+  // Returns true if there was an error
   const handleOnSubmit = async (
     values: Schema,
     deleting: FormikHelpers<Schema>["setSubmitting"] | false = false
   ) => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
     setError(null);
     try {
       if (student) {
@@ -83,7 +83,9 @@ export default function Student() {
         else if (error) setError(error.description);
         else setError("Error desconocido");
       } else showError(e as Error);
+      return true;
     }
+    return false;
   };
 
   if (loading) return <CenteredCircularProgress />;
@@ -120,6 +122,7 @@ export default function Student() {
               <FormInputs a={a} />
 
               <CenteredHorizontalBox sx={{ mt: 4 }}>
+                {/* Save button */}
                 <LoadingButton
                   variant="contained"
                   onClick={a.submitForm}
@@ -133,6 +136,7 @@ export default function Student() {
                   Guardar
                 </LoadingButton>
 
+                {/* Delete button */}
                 <LoadingButton
                   sx={{
                     mb: { sm: 3 },
@@ -147,9 +151,10 @@ export default function Student() {
                   variant="outlined"
                   loading={a.isSubmitting}
                   disabled={a.isSubmitting}
-                  onClick={() => {
+                  onClick={async () => {
                     a.setSubmitting(true);
-                    handleOnSubmit(a.values, a.setSubmitting);
+                    const error = await handleOnSubmit(a.values, a.setSubmitting);
+                    if (error) a.setSubmitting(false);
                   }}
                 >
                   Eliminar

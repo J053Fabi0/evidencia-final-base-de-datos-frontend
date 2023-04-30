@@ -18,7 +18,7 @@ export default function useErrorDialog({
   okBtnText = "Ok",
   onClose = () => {},
   openDefault = false,
-  title = "Hubo un error :(",
+  title = "Hubo un error desconocido :(",
 } = {}) {
   const [error, setError] = useState<Error>(() => new Error());
   const [copied, setCopied] = useState(false);
