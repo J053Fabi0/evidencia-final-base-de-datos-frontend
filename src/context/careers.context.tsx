@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useAdmin } from "./admin.context";
 import http from "../http-common";
 
-type CareersOrNull = Career[] | null;
+export type CareersOrNull = Career[] | null;
 
 const CareersContext = createContext<CareersOrNull>(null);
 const CareersUpdateContext = createContext<React.Dispatch<React.SetStateAction<CareersOrNull>>>(null as any);

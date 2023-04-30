@@ -8,12 +8,6 @@ export const CenteredCircularProgress = styled(CircularProgress)`
   transform: translate(-50%, -50%);
 `;
 
-export const CenteredBox = styled(Box)`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-`;
-
 export const CenteredHorizontalBox = styled(Box)`
   display: flex;
   justify-content: center;

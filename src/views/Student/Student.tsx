@@ -1,67 +1,33 @@
-import {
-  CenteredBox,
-  CenteredHorizontalBox,
-  FormikSimpleTextField,
-  CenteredCircularProgress,
-} from "../../components/Mixins";
-import * as Yup from "yup";
 import "../../css/DatePicker.css";
+import Box from "@mui/material/Box";
 import http from "../../http-common";
-import { LoadingButton } from "@mui/lab";
+import Grid from "@mui/material/Grid";
+import Alert from "@mui/material/Alert";
+import Paper from "@mui/material/Paper";
 import "react-calendar/dist/Calendar.css";
+import Select from "@mui/material/Select";
 import DatePicker from "react-date-picker";
 import hasError from "../../utils/hasError";
+import GoBack from "../../components/GoBack";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import Typography from "@mui/material/Typography";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { statuses } from "../../types/status.type";
 import { Formik, Form as FormikForm } from "formik";
+import FormControl from "@mui/material/FormControl";
+import useTextDialog from "../../hooks/useTextDialog";
 import { useAdmin } from "../../context/admin.context";
 import useErrorDialog from "../../hooks/useErrorDialog";
 import { useNavigate, useParams } from "react-router-dom";
+import FormHelperText from "@mui/material/FormHelperText";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useCareers } from "../../context/careers.context";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { isServerError } from "../../types/serverError.type";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReloadStudents, useStudents } from "../../context/students.context";
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import {
-  Box,
-  Grid,
-  Alert,
-  Paper,
-  Select,
-  MenuItem,
-  InputLabel,
-  Typography,
-  FormControl,
-  FormHelperText,
-  Button,
-} from "@mui/material";
-import useTextDialog from "../../hooks/useTextDialog";
-
-const minYears = 18;
-const maxYears = 35;
-const maxDate = new Date();
-maxDate.setFullYear(maxDate.getFullYear() - minYears);
-const minDate = new Date();
-minDate.setFullYear(minDate.getFullYear() - maxYears);
-
-interface Schema {
-  name: string;
-  career: string;
-  email?: string;
-  phone?: string;
-  birthDate: Date;
-  direction?: string;
-  secondName: string;
-  status: "inscrito" | "no inscrito";
-}
-
-const getValuesToPatch = (values: Schema, defaultValues: Schema) => {
-  return Object.fromEntries(
-    (Object.entries(values) as [keyof Schema, string | Date][])
-      // filter out values that are the same as the student's
-      .filter(([key, value]) => `${value}` !== `${defaultValues[key]}`)
-  ) as Partial<Schema>;
-};
+import { CenteredHorizontalBox, FormikSimpleTextField, CenteredCircularProgress } from "../../components/Mixins";
+import { getValuesToPatch, Schema, useDefaultValues, maxDate, minDate, schema, spacerFor } from "./studentUtils";
 
 export default function Student() {
   const admin = useAdmin();
@@ -70,48 +36,15 @@ export default function Student() {
   const navigate = useNavigate();
   const students = useStudents();
   const reloadStudents = useReloadStudents();
+  const dialog = useTextDialog({ content: null });
   const student = students?.find((s) => s.id === id);
   const loading = students === null || careers === null;
-  const setValuesRef =
-    useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
-
-  const [error, setError] = useState<string | null>(null);
-  const {
-    Dialog: TextDialog,
-    setOpen: setTextDialogOpen,
-    setTitle: setTextDialogTitle,
-  } = useTextDialog({
-    title: "",
-    content: null,
-  });
+  const defaultValues = useDefaultValues(student, careers);
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
-  const schema = Yup.object().shape({
-    // required
-    name: Yup.string().required("Requerido."),
-    career: Yup.string().required("Requerido."),
-    secondName: Yup.string().required("Requerido."),
-    birthDate: Yup.date().max(maxDate).min(minDate).required("Requerido."),
-    status: Yup.string().oneOf(statuses).required("Requerido."),
-    // optional
-    direction: Yup.string(),
-    email: Yup.string().email("Correo inválido."),
-    phone: Yup.string().max(20, "Máximo 20 caracteres."),
-  });
-
-  const defaultValues: Schema = useMemo(
-    () => ({
-      name: (student && student.name) ?? "",
-      email: (student && student.email) ?? "",
-      phone: (student && student.phone) ?? "",
-      direction: (student && student.direction) ?? "",
-      secondName: (student && student.secondName) ?? "",
-      birthDate: (student && student.birthDate) ?? maxDate,
-      career: (careers && student && student.career) ?? "",
-      status: (student && student.status) ?? ("" as "inscrito"),
-    }),
-    [student, careers]
-  );
+  const [error, setError] = useState<string | null>(null);
+  const setValuesRef =
+    useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
 
   useLayoutEffect(() => {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
@@ -122,57 +55,38 @@ export default function Student() {
     try {
       // editiing student
       if (student) {
-        const { status } = await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
-        if (status === 200) {
-          await reloadStudents();
-          setTextDialogTitle("Guardado exitosamente");
-          setTextDialogOpen(true);
-        } else if (status === 401) navigate("/signin");
+        await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
+        await reloadStudents();
+        dialog.setTitle("Guardado exitosamente");
+        dialog.setOpen(true);
       }
       // registering student
       else {
-        const { status, data } = await http.post<{ message: string }>("/student", values);
-        if (status === 200) {
-          await reloadStudents();
-          setTextDialogTitle("Registrado exitosamente");
-          setTextDialogOpen(true);
-          navigate(setAdminParams(`/student/${data.message}`, admin));
-        } else if (status === 401) navigate("/signin");
+        const { data } = await http.post<{ message: string }>("/student", values);
+        await reloadStudents();
+        dialog.setTitle("Registrado exitosamente");
+        dialog.setOpen(true);
+        navigate(setAdminParams(`/student/${data.message}`, admin));
       }
     } catch (e: unknown) {
       if (isServerError(e)) {
         const error = e.response?.data.error;
-        if (error === "Unauthorized") setError("Usuario o contraseña equivocada");
+        if (e.response?.status === 401 || error === "Unauthorized") navigate("/signin");
         else if (error) setError(error.description);
         else setError("Error desconocido");
       } else showError(e as Error);
+
       return false;
     }
 
     return true;
   };
 
-  const spacerFor1 = { xs: 12 };
-  const spacerFor2 = { xs: 12, md: 6 };
-  const spacerFor3 = { xs: 12, md: 4 };
-
   if (loading) return <CenteredCircularProgress />;
   if (!student && id) return <Typography variant="h2">Estudiante no encontrado</Typography>;
   return (
     <Paper sx={{ p: 3, mt: 3, position: "relative" }} elevation={3}>
-      <Button
-        sx={{ position: "absolute", top: 0, left: 0, mt: 2, ml: 2 }}
-        onClick={() => {
-          // go back in the history if possible
-          if (window.history.length > 2) window.history.back();
-          // go to home if not
-          else navigate(setAdminParams("/", admin));
-        }}
-        variant="outlined"
-        startIcon={<KeyboardArrowLeftIcon />}
-      >
-        Regresar
-      </Button>
+      <GoBack />
 
       <Typography variant="h2" align="center" mb={2}>
         {student ? `${student.name} ${student.secondName}` : "Registrar estudiante"}
@@ -190,11 +104,11 @@ export default function Student() {
           values,
           errors,
           touched,
+          isValid,
           setValues,
           submitForm,
           handleBlur,
           submitCount,
-          isValid,
           isSubmitting,
           handleSubmit,
           handleChange,
@@ -204,16 +118,16 @@ export default function Student() {
             <FormikForm onSubmit={handleSubmit}>
               {/* Error message */}
               {error && (
-                <CenteredBox sx={{ mt: 3 }}>
+                <CenteredHorizontalBox sx={{ mt: 3 }}>
                   <Alert sx={{ mt: 2 }} severity="error">
                     {error}
                   </Alert>
-                </CenteredBox>
+                </CenteredHorizontalBox>
               )}
 
               <Grid container spacing={2}>
                 {/* Name */}
-                <Grid item {...spacerFor3}>
+                <Grid item {...spacerFor[3]}>
                   <FormikSimpleTextField
                     required
                     id="name"
@@ -228,7 +142,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Second name */}
-                <Grid item {...spacerFor3}>
+                <Grid item {...spacerFor[3]}>
                   <FormikSimpleTextField
                     required
                     id="secondName"
@@ -243,7 +157,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Birthday */}
-                <Grid mt={2} item {...spacerFor3}>
+                <Grid mt={2} item {...spacerFor[3]}>
                   <Box component={FormControl} fullWidth>
                     <InputLabel
                       shrink
@@ -270,7 +184,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Career */}
-                <Grid item {...spacerFor2} mt={2}>
+                <Grid item {...spacerFor[2]} mt={2}>
                   <FormControl fullWidth required error={hasError("career", touched, errors, submitCount)}>
                     <InputLabel id="career-select">Carrera</InputLabel>
                     <Select
@@ -295,7 +209,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Status */}
-                <Grid item {...spacerFor2} mt={2}>
+                <Grid item {...spacerFor[2]} mt={2}>
                   <FormControl fullWidth required error={hasError("status", touched, errors, submitCount)}>
                     <InputLabel id="status-select">Status</InputLabel>
                     <Select
@@ -319,7 +233,7 @@ export default function Student() {
                   </FormControl>
                 </Grid>
 
-                <Grid item mt={3} {...spacerFor1}>
+                <Grid item mt={3} {...spacerFor[1]}>
                   <CenteredHorizontalBox>
                     <Typography variant="h5">Datos opcionales</Typography>
                   </CenteredHorizontalBox>
@@ -328,7 +242,7 @@ export default function Student() {
 
               <Grid container spacing={2}>
                 {/* Email */}
-                <Grid item {...spacerFor2}>
+                <Grid item {...spacerFor[2]}>
                   <FormikSimpleTextField
                     id="email"
                     onBlur={handleBlur}
@@ -342,7 +256,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Phone */}
-                <Grid item {...spacerFor2}>
+                <Grid item {...spacerFor[2]}>
                   <FormikSimpleTextField
                     id="phone"
                     label="Teléfono"
@@ -356,7 +270,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Direction */}
-                <Grid item {...spacerFor1}>
+                <Grid item {...spacerFor[1]}>
                   <FormikSimpleTextField
                     id="direction"
                     label="Dirección"
@@ -370,7 +284,7 @@ export default function Student() {
                 </Grid>
               </Grid>
 
-              <CenteredBox sx={{ mt: 3 }}>
+              <CenteredHorizontalBox sx={{ mt: 3 }}>
                 <LoadingButton
                   variant="contained"
                   onClick={submitForm}
@@ -383,14 +297,14 @@ export default function Student() {
                 >
                   Guardar
                 </LoadingButton>
-              </CenteredBox>
+              </CenteredHorizontalBox>
             </FormikForm>
           );
         }}
       </Formik>
 
       {ErrorDialog}
-      {TextDialog}
+      {dialog.Dialog}
     </Paper>
   );
 }
