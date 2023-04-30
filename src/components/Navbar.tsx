@@ -37,12 +37,7 @@ export default function Navbar() {
               <MenuIcon />
             </IconButton>
 
-            <Typography
-              noWrap
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-            >
+            <Typography noWrap variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <Link to={setAdminParams("/", admin)} style={{ textDecoration: "none", color: "inherit" }}>
                 Estudiantes
               </Link>
