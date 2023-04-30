@@ -5,7 +5,7 @@ import Student from "../../types/student.type";
 import { useLayoutEffect, useState } from "react";
 import { useAdmin } from "../../context/admin.context";
 import { useCareers } from "../../context/careers.context";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { useStudents } from "../../context/students.context";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
@@ -72,7 +72,14 @@ export default function Home() {
   if (admin === null) return null;
   return (
     <>
-      <Typography sx={{ my: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
+      <Box mt={3} mb={2} display="flex" sx={{ justifyContent: "space-between" }}>
+        <Typography sx={{ ml: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
+        <Link to={setAdminParams("student", admin)}>
+          <Button variant="contained" endIcon={<Add />}>
+            Registrar estudiante
+          </Button>
+        </Link>
+      </Box>
 
       {loading ? (
         <CenteredCircularProgress />
