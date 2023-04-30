@@ -7,7 +7,6 @@ import "react-calendar/dist/Calendar.css";
 import GoBack from "../../components/GoBack";
 import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Formik, Form as FormikForm } from "formik";
 import useTextDialog from "../../hooks/useTextDialog";
 import { useAdmin } from "../../context/admin.context";
 import useErrorDialog from "../../hooks/useErrorDialog";
@@ -16,6 +15,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useCareers } from "../../context/careers.context";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { isServerError } from "../../types/serverError.type";
+import { Formik, Form as FormikForm, FormikHelpers } from "formik";
 import { useReloadStudents, useStudents } from "../../context/students.context";
 import { getValuesToPatch, Schema, useDefaultValues, schema } from "./studentUtils";
 import { CenteredHorizontalBox, CenteredCircularProgress } from "../../components/Mixins";
@@ -33,7 +33,6 @@ export default function Student() {
   const defaultValues = useDefaultValues(student, careers);
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
-  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setValuesRef =
     useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
@@ -42,15 +41,32 @@ export default function Student() {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
   }, [student, defaultValues]);
 
-  const handleOnSubmit = async (values: Schema) => {
+  const handleOnSubmit = async (
+    values: Schema,
+    deleting: FormikHelpers<Schema>["setSubmitting"] | false = false
+  ) => {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     setError(null);
     try {
-      // editiing student
       if (student) {
-        await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
-        await reloadStudents();
-        dialog.setTitle("Guardado exitosamente");
-        dialog.setOpen(true);
+        // deleting student
+        if (deleting) {
+          await http.delete(`/student/${id}`);
+          dialog.setTitle("Eliminado exitosamente");
+          dialog.setOpen(true);
+          dialog.setOnClose(() => () => {
+            reloadStudents();
+            navigate(setAdminParams("/", admin));
+            deleting(false);
+          });
+        }
+        // editiing student
+        else {
+          await http.patch(`/student`, { ...getValuesToPatch(values, defaultValues), id });
+          await reloadStudents();
+          dialog.setTitle("Guardado exitosamente");
+          dialog.setOpen(true);
+        }
       }
       // registering student
       else {
@@ -67,11 +83,7 @@ export default function Student() {
         else if (error) setError(error.description);
         else setError("Error desconocido");
       } else showError(e as Error);
-
-      return false;
     }
-
-    return true;
   };
 
   if (loading) return <CenteredCircularProgress />;
@@ -85,8 +97,8 @@ export default function Student() {
       </Typography>
 
       <Formik
-        onSubmit={async (values, { setSubmitting, resetForm }) => {
-          if (await handleOnSubmit(values)) resetForm({ values: defaultValues });
+        onSubmit={async (values, { setSubmitting }) => {
+          await handleOnSubmit(values);
           setSubmitting(false);
         }}
         validationSchema={schema}
@@ -129,14 +141,16 @@ export default function Student() {
                     bottom: { sm: 0 },
                     ml: { xs: 3, sm: 0 },
                     position: { sm: "absolute" },
+                    display: student ? "block" : "none",
                   }}
-                  variant="outlined"
                   color="error"
-                  onClick={async () => {
-                    a.setSubmitting(true);
-                  }}
+                  variant="outlined"
                   loading={a.isSubmitting}
-                  disabled={a.isSubmitting || deleting}
+                  disabled={a.isSubmitting}
+                  onClick={() => {
+                    a.setSubmitting(true);
+                    handleOnSubmit(a.values, a.setSubmitting);
+                  }}
                 >
                   Eliminar
                 </LoadingButton>
