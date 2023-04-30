@@ -174,7 +174,7 @@ export default function Student() {
         Regresar
       </Button>
 
-      <Typography variant="h2" align="center">
+      <Typography variant="h2" align="center" mb={2}>
         {student ? `${student.name} ${student.secondName}` : "Registrar estudiante"}
       </Typography>
 
@@ -243,7 +243,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Birthday */}
-                <Grid sx={{ mt: 3 }} item {...spacerFor3}>
+                <Grid mt={2} item {...spacerFor3}>
                   <Box component={FormControl} fullWidth>
                     <InputLabel
                       shrink
@@ -270,7 +270,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Career */}
-                <Grid item {...spacerFor2} mt={3}>
+                <Grid item {...spacerFor2} mt={2}>
                   <FormControl fullWidth required error={hasError("career", touched, errors, submitCount)}>
                     <InputLabel id="career-select">Carrera</InputLabel>
                     <Select
@@ -295,7 +295,7 @@ export default function Student() {
                 </Grid>
 
                 {/* Status */}
-                <Grid item {...spacerFor2} mt={3}>
+                <Grid item {...spacerFor2} mt={2}>
                   <FormControl fullWidth required error={hasError("status", touched, errors, submitCount)}>
                     <InputLabel id="status-select">Status</InputLabel>
                     <Select

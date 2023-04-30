@@ -29,7 +29,7 @@ export function FormikSimpleTextField({
   return (
     <TextField
       fullWidth
-      sx={{ mt: 3 }}
+      sx={{ mt: 2 }}
       error={hasError}
       variant="outlined"
       helperText={hasError ? errorName : ""}
