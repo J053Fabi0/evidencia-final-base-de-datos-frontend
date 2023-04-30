@@ -61,13 +61,16 @@ export function useDefaultValues(student: Student | undefined, careers: CareersO
 
 export const schema = Yup.object().shape({
   // required
-  name: Yup.string().required("Requerido."),
+  name: Yup.string().min(2, "Al menos 2 caracteres.").max(40, "No más de 40 caracteres.").required("Requerido."),
   career: Yup.string().required("Requerido."),
-  secondName: Yup.string().required("Requerido."),
+  secondName: Yup.string()
+    .min(2, "Al menos 2 caracteres.")
+    .max(80, "No más de 80 caracteres.")
+    .required("Requerido."),
   status: Yup.string().oneOf(statuses).required("Requerido."),
   birthDate: Yup.date().max(maxDate).min(minDate).required("Requerido."),
   // optional
-  direction: Yup.string(),
+  direction: Yup.string().max(200, "No más de 200 caracteres."),
   email: Yup.string().email("Correo inválido."),
   phone: Yup.string().max(20, "Máximo 20 caracteres."),
 });
