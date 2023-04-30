@@ -33,6 +33,7 @@ export default function Student() {
   const defaultValues = useDefaultValues(student, careers);
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setValuesRef =
     useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
@@ -77,9 +78,9 @@ export default function Student() {
   if (!student && id) return <Typography variant="h2">Estudiante no encontrado</Typography>;
   return (
     <Paper sx={{ p: 3, mt: 3, position: "relative" }} elevation={3}>
-      <GoBack />
+      <GoBack sx={{ mb: 1 }} />
 
-      <Typography variant="h2" align="center" mb={2}>
+      <Typography variant="h3" align="center" mb={{ xs: 3, lg: 3 }} mt={{ xs: 1, lg: 0 }}>
         {student ? `${student.name} ${student.secondName}` : "Registrar estudiante"}
       </Typography>
 
@@ -106,7 +107,7 @@ export default function Student() {
 
               <FormInputs a={a} />
 
-              <CenteredHorizontalBox sx={{ mt: 3 }}>
+              <CenteredHorizontalBox sx={{ mt: 4 }}>
                 <LoadingButton
                   variant="contained"
                   onClick={a.submitForm}
@@ -118,6 +119,26 @@ export default function Student() {
                   }
                 >
                   Guardar
+                </LoadingButton>
+
+                <LoadingButton
+                  sx={{
+                    mb: { sm: 3 },
+                    mr: { sm: 3 },
+                    right: { sm: 0 },
+                    bottom: { sm: 0 },
+                    ml: { xs: 3, sm: 0 },
+                    position: { sm: "absolute" },
+                  }}
+                  variant="outlined"
+                  color="error"
+                  onClick={async () => {
+                    a.setSubmitting(true);
+                  }}
+                  loading={a.isSubmitting}
+                  disabled={a.isSubmitting || deleting}
+                >
+                  Eliminar
                 </LoadingButton>
               </CenteredHorizontalBox>
             </FormikForm>

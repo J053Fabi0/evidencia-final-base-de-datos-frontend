@@ -37,7 +37,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
   if (!careers) return null;
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={{ xs: 2, lg: 3 }} mt={0}>
         {/* Name */}
         <Grid item {...spacerFor[3]}>
           <FormikSimpleTextField
@@ -69,7 +69,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
         </Grid>
 
         {/* Birthday */}
-        <Grid mt={2} item {...spacerFor[3]}>
+        <Grid item {...spacerFor[3]}>
           <Box component={FormControl} fullWidth>
             <InputLabel
               shrink
@@ -96,7 +96,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
         </Grid>
 
         {/* Career */}
-        <Grid item {...spacerFor[2]} mt={2}>
+        <Grid item {...spacerFor[2]}>
           <FormControl fullWidth required error={hasError("career", a)}>
             <InputLabel id="career-select">Carrera</InputLabel>
             <Select
@@ -119,7 +119,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
         </Grid>
 
         {/* Status */}
-        <Grid item {...spacerFor[2]} mt={2}>
+        <Grid item {...spacerFor[2]}>
           <FormControl fullWidth required error={hasError("status", a)}>
             <InputLabel id="status-select">Status</InputLabel>
             <Select
@@ -140,15 +140,15 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             <FormHelperText>{(hasError("status", a) && a.errors.status) || ""}</FormHelperText>
           </FormControl>
         </Grid>
-
-        <Grid item mt={2} {...spacerFor[1]}>
-          <CenteredHorizontalBox>
-            <Typography variant="h5">Datos opcionales</Typography>
-          </CenteredHorizontalBox>
-        </Grid>
       </Grid>
 
-      <Grid container spacing={2}>
+      <Box sx={{ width: "100%", mt: 3, mb: 2 }}>
+        <CenteredHorizontalBox>
+          <Typography variant="h5">Datos opcionales</Typography>
+        </CenteredHorizontalBox>
+      </Box>
+
+      <Grid container spacing={{ xs: 2, lg: 3 }} mt={0}>
         {/* Email */}
         <Grid item {...spacerFor[2]}>
           <FormikSimpleTextField

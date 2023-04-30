@@ -21,13 +21,6 @@ export function FormikSimpleTextField({
   ...other
 }: { hasError: boolean; errorName?: string } & TextFieldProps) {
   return (
-    <TextField
-      fullWidth
-      sx={{ mt: 2 }}
-      error={hasError}
-      variant="outlined"
-      helperText={hasError ? errorName : ""}
-      {...other}
-    />
+    <TextField fullWidth error={hasError} variant="outlined" helperText={hasError ? errorName : ""} {...other} />
   );
 }

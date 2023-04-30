@@ -3,8 +3,9 @@ import { useCallback, useState } from "react";
 import { Button, DialogTitle, DialogActions, Dialog, IconButton, DialogContent } from "@mui/material";
 
 // dialogTitle props using it's typeof
-type DialogTitleProps = Omit<Parameters<typeof DialogTitle>[0], "sx">;
-type DialogProps = Parameters<typeof Dialog>[0];
+type DialogTitleProps = Omit<React.ComponentProps<typeof DialogTitle>, "sx">;
+
+type DialogProps = React.ComponentProps<typeof Dialog>;
 
 const BootstrapDialogTitle = ({
   children,

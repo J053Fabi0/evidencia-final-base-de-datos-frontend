@@ -1,16 +1,27 @@
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-import { setAdminParams } from "../utils/setAdminParams";
 import { useAdmin } from "../context/admin.context";
+import { setAdminParams } from "../utils/setAdminParams";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
-export default function GoBack() {
+type ButtonProps = React.ComponentProps<typeof Button>;
+
+export const breakPoint = "lg" as const;
+
+export default function GoBack({ sx, ...props }: ButtonProps) {
   const admin = useAdmin();
   const navigate = useNavigate();
 
   return (
     <Button
-      sx={{ position: "absolute", top: 0, left: 0, mt: 2, ml: 2 }}
+      sx={{
+        mt: { [breakPoint]: 3 },
+        ml: { [breakPoint]: 3 },
+        top: { [breakPoint]: 0 },
+        left: { [breakPoint]: 0 },
+        position: { [breakPoint]: "absolute" },
+        ...sx,
+      }}
       onClick={() => {
         // go back in the history if possible
         if (window.history.length > 2) window.history.back();
@@ -19,6 +30,7 @@ export default function GoBack() {
       }}
       variant="outlined"
       startIcon={<KeyboardArrowLeftIcon />}
+      {...props}
     >
       Regresar
     </Button>
