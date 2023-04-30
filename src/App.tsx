@@ -1,3 +1,5 @@
+import moment from "moment";
+import "moment/locale/es-mx";
 import Home from "./views/Home/Home";
 import Signin from "./views/Signin/Signin";
 import Student from "./views/Student/Student";
@@ -6,6 +8,8 @@ import { AdminProvider } from "./context/admin.context";
 import { CareersProvider } from "./context/careers.context";
 import { StudentsProvider } from "./context/students.context";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+
+moment.locale("es-mx");
 
 export default function App() {
   return (

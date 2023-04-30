@@ -73,18 +73,8 @@ export default function Signin() {
         validationSchema={schema}
         initialValues={defaultValues}
       >
-        {({
-          values,
-          errors,
-          touched,
-          submitForm,
-          submitCount,
-          isSubmitting,
-          handleBlur,
-          handleSubmit,
-          handleChange,
-        }) => (
-          <FormikForm onSubmit={handleSubmit}>
+        {(a) => (
+          <FormikForm onSubmit={a.handleSubmit}>
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <Box sx={{ maxWidth: "500px" }}>
                 {/* Error message */}
@@ -95,26 +85,19 @@ export default function Signin() {
                 )}
 
                 {/* Username */}
-                <FormControl
-                  fullWidth
-                  sx={{ mt: 3 }}
-                  variant="outlined"
-                  error={hasError("username", touched, errors, submitCount)}
-                >
+                <FormControl fullWidth sx={{ mt: 3 }} variant="outlined" error={hasError("username", a)}>
                   <InputLabel htmlFor="username">Usuario</InputLabel>
                   <OutlinedInput
                     id="username"
                     type="username"
                     label="Usuario"
-                    onBlur={handleBlur}
-                    value={values.username}
-                    disabled={isSubmitting}
-                    onChange={handleChange}
+                    onBlur={a.handleBlur}
+                    value={a.values.username}
+                    disabled={a.isSubmitting}
+                    onChange={a.handleChange}
                     autoFocus={!defaultValues.username}
                   />
-                  <FormHelperText>
-                    {(hasError("username", touched, errors, submitCount) && errors.username) || ""}
-                  </FormHelperText>
+                  <FormHelperText>{(hasError("username", a) && a.errors.username) || ""}</FormHelperText>
                 </FormControl>
 
                 {/* Contraseña */}
@@ -125,15 +108,15 @@ export default function Signin() {
                   type="password"
                   label="Contraseña"
                   variant="outlined"
-                  onBlur={handleBlur}
-                  value={values.password}
-                  disabled={isSubmitting}
+                  onBlur={a.handleBlur}
+                  value={a.values.password}
+                  disabled={a.isSubmitting}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") submitForm();
+                    if (e.key === "Enter") a.submitForm();
                   }}
-                  onChange={handleChange}
-                  error={hasError("password", touched, errors, submitCount)}
-                  helperText={hasError("password", touched, errors, submitCount) ? errors.password : ""}
+                  onChange={a.handleChange}
+                  error={hasError("password", a)}
+                  helperText={hasError("password", a) ? a.errors.password : ""}
                 />
 
                 <Box
@@ -144,7 +127,7 @@ export default function Signin() {
                     flexDirection: "column",
                   }}
                 >
-                  <LoadingButton variant="contained" onClick={submitForm} loading={isSubmitting}>
+                  <LoadingButton variant="contained" onClick={a.submitForm} loading={a.isSubmitting}>
                     Iniciar Sesión
                   </LoadingButton>
                 </Box>

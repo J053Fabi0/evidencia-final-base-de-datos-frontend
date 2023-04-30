@@ -1,20 +1,17 @@
-import "moment/locale/es-mx";
 import moment from "moment";
-import { Box, Button, Typography } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import Student from "../../types/student.type";
 import { useLayoutEffect, useState } from "react";
 import { useAdmin } from "../../context/admin.context";
+import { Box, Button, Typography } from "@mui/material";
 import { useCareers } from "../../context/careers.context";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setAdminParams } from "../../utils/setAdminParams";
 import { useStudents } from "../../context/students.context";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CenteredCircularProgress } from "../../components/Mixins";
 import capitalizeFirstLetter from "../../utils/capitalizeFirstLetter";
 import { DataGrid, GridColDef, GridPagination } from "@mui/x-data-grid";
-import { Add } from "@mui/icons-material";
-
-moment.locale("es-mx");
 
 const columns: GridColDef[] = [
   { field: "name", headerName: "Nombre", width: 300 },
@@ -42,15 +39,15 @@ export default function Home() {
   const admin = useAdmin();
   useRedirectIfTrue(admin === null, "/signin");
 
+  const careers = useCareers();
   const navigate = useNavigate();
   const students = useStudents();
-  const careers = useCareers();
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
 
-  const page = (parseInt(queryParams.get("page") ?? "1") || 1) - 1;
   const [rows, setRows] = useState<Row[]>([]);
   const loading = students === null || careers === null;
+  const page = (parseInt(queryParams.get("page") ?? "1") || 1) - 1;
 
   useLayoutEffect(() => {
     if (students !== null && careers !== null)
