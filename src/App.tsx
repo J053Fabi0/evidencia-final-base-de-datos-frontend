@@ -1,6 +1,7 @@
 import moment from "moment";
 import "moment/locale/es-mx";
 import Home from "./views/Home/Home";
+import Career from "./views/Career/Career";
 import Signin from "./views/Signin/Signin";
 import Student from "./views/Student/Student";
 import NavbarHOC from "./components/NavbarHOC";
@@ -22,6 +23,9 @@ export default function App() {
               <Route path="/signin" element={<Signin />} />
               <Route path="/student" element={NavbarHOC(Student)} />
               <Route path="/student/:id" element={NavbarHOC(Student)} />
+              <Route path="/careers" element={NavbarHOC(Career)} />
+              <Route path="/career/new" element={NavbarHOC(Career)} />
+              <Route path="/career/:id" element={NavbarHOC(Career)} />
 
               {/* Default route */}
               <Route path="*" element={NavbarHOC(Home)} />

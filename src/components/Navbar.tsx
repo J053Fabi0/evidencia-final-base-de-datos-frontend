@@ -80,12 +80,14 @@ export default function Navbar() {
                   <ListItemText>Registrar estudiante</ListItemText>
                 </MenuItem>
               </Link>
-              <MenuItem onClick={handleClose("menu")}>
-                <ListItemIcon>
-                  <School />
-                </ListItemIcon>
-                <ListItemText>Crear carrera</ListItemText>
-              </MenuItem>
+              <Link to={setAdminParams("/career/new", admin)} style={{ textDecoration: "none", color: "inherit" }}>
+                <MenuItem onClick={handleClose("menu")}>
+                  <ListItemIcon>
+                    <School />
+                  </ListItemIcon>
+                  <ListItemText>Crear carrera</ListItemText>
+                </MenuItem>
+              </Link>
             </Menu>
           </Toolbar>
         </Container>

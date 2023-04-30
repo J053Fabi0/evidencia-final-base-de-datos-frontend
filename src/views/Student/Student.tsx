@@ -34,9 +34,9 @@ export default function Student() {
   const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
   const [error, setError] = useState<string | null>(null);
-  const setValuesRef =
-    useRef<(values: React.SetStateAction<Schema>, shouldValidate?: boolean | undefined) => void>();
+  const setValuesRef = useRef<FormikHelpers<Schema>["setValues"]>();
 
+  // Set the default values every time the student or the default values change
   useLayoutEffect(() => {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
   }, [student, defaultValues]);
