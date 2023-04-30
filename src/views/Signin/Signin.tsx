@@ -2,11 +2,11 @@ import * as Yup from "yup";
 import { useState } from "react";
 import http from "../../http-common";
 import { LoadingButton } from "@mui/lab";
-import isError from "../../utils/isError";
 import hasError from "../../utils/hasError";
 import { useLocation } from "react-router-dom";
 import { Formik, Form as FormikForm } from "formik";
 import useErrorDialog from "../../hooks/useErrorDialog";
+import { isServerError } from "../../types/serverError.type";
 import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
 import { useAdmin, useSignIn } from "../../context/admin.context";
 import { OutlinedInput, FormHelperText, Alert } from "@mui/material";
@@ -36,9 +36,12 @@ export default function Signin() {
       if (status === 200) signIn({ password, username });
       else throw new Error("Usuario o contraseña equivocada");
     } catch (e: unknown) {
-      if (isError(e) && e.message === "Request failed with status code 401")
-        setError("Usuario o contraseña equivocada");
-      else showError(e as Error);
+      if (isServerError(e)) {
+        const error = e.response?.data.error;
+        if (e.response?.status === 401 || error === "Unauthorized") setError("Usuario o contraseña equivocada");
+        else if (error) setError(error.description);
+        else setError("Error desconocido");
+      } else showError(e as Error);
       return false;
     }
 
