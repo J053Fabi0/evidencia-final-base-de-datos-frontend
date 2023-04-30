@@ -69,13 +69,24 @@ export default function Home() {
   if (admin === null) return null;
   return (
     <>
-      <Box mt={3} mb={2} display="flex" sx={{ justifyContent: "space-between" }}>
-        <Typography sx={{ ml: 3 }} variant="h4">{`Hola, ${admin.username}`}</Typography>
-        <Link to={setAdminParams("student", admin)}>
-          <Button variant="contained" endIcon={<Add />}>
-            Registrar estudiante
-          </Button>
-        </Link>
+      <Box mt={3} mb={2} sx={{ justifyContent: { sm: "space-between" }, display: { sm: "flex" } }}>
+        <Typography sx={{ ml: { sm: 3 }, mb: { xs: 2, sm: 0 } }} variant="h4">
+          {`Hola, ${admin.username}`}
+        </Typography>
+
+        <Box
+          sx={{
+            width: { xs: "100%", sm: "auto" },
+            display: { xs: "flex", sm: "block" },
+            justifyContent: { xs: "end", sm: "flex-end" },
+          }}
+        >
+          <Link to={setAdminParams("student", admin)}>
+            <Button variant="contained" endIcon={<Add />}>
+              Registrar estudiante
+            </Button>
+          </Link>
+        </Box>
       </Box>
 
       {loading ? (
