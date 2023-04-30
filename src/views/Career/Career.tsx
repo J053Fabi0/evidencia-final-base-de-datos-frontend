@@ -17,6 +17,7 @@ import { useCareers, useReloadCareers } from "../../context/careers.context";
 import capitalizeFirstLetter from "../../utils/capitalizeFirstLetter";
 import deleteExtraSpacesInBetween from "../../utils/deleteExtraSpacesInBetween";
 import { CenteredCircularProgress, CenteredHorizontalBox, FormikSimpleTextField } from "../../components/Mixins";
+import GoBack from "../../components/GoBack";
 
 export default function Career() {
   const admin = useAdmin();
@@ -77,6 +78,8 @@ export default function Career() {
   if (!creating && !career) return <Typography variant="h2">Carrera no encontrada</Typography>;
   return (
     <Paper sx={{ p: 3, mt: 3, position: "relative" }} elevation={3}>
+      <GoBack />
+
       <Typography variant="h3" align="center" mb={{ xs: 3, lg: 3 }} mt={{ xs: 1, lg: 0 }}>
         {creating ? "Crear una carrera" : career!.name} <School fontSize="large" />
       </Typography>

@@ -4,6 +4,7 @@ import Home from "./views/Home/Home";
 import Career from "./views/Career/Career";
 import Signin from "./views/Signin/Signin";
 import Student from "./views/Student/Student";
+import Careers from "./views/Careers/Careers";
 import NavbarHOC from "./components/NavbarHOC";
 import { AdminProvider } from "./context/admin.context";
 import { CareersProvider } from "./context/careers.context";
@@ -23,7 +24,7 @@ export default function App() {
               <Route path="/signin" element={<Signin />} />
               <Route path="/student" element={NavbarHOC(Student)} />
               <Route path="/student/:id" element={NavbarHOC(Student)} />
-              <Route path="/careers" element={NavbarHOC(Career)} />
+              <Route path="/careers" element={NavbarHOC(Careers)} />
               <Route path="/career/new" element={NavbarHOC(Career)} />
               <Route path="/career/:id" element={NavbarHOC(Career)} />
 

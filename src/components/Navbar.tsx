@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAdmin, useSignOut } from "../context/admin.context";
-import { AccountCircle, Add, School, Logout, Menu as MenuIcon } from "@mui/icons-material";
+import { AccountCircle, Add, School, Logout, Menu as MenuIcon, ListAlt } from "@mui/icons-material";
 
 import { Container, ListItemIcon, ListItemText } from "@mui/material";
 import { Typography, Menu, MenuItem, IconButton, Toolbar, AppBar, Box } from "@mui/material";
@@ -78,6 +78,14 @@ export default function Navbar() {
                     <Add />
                   </ListItemIcon>
                   <ListItemText>Registrar estudiante</ListItemText>
+                </MenuItem>
+              </Link>
+              <Link to={setAdminParams("/careers", admin)} style={{ textDecoration: "none", color: "inherit" }}>
+                <MenuItem onClick={handleClose("menu")}>
+                  <ListItemIcon>
+                    <ListAlt />
+                  </ListItemIcon>
+                  <ListItemText>Carreras</ListItemText>
                 </MenuItem>
               </Link>
               <Link to={setAdminParams("/career/new", admin)} style={{ textDecoration: "none", color: "inherit" }}>

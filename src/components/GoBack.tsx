@@ -12,7 +12,7 @@ export const breakPoint = "lg" as const;
  * This component is a button that goes back in the history if possible, or goes to homePath if not.
  * Make sure the parent component has a position relative.
  */
-export default function GoBack({ sx, homePath = "/", ...props }: ButtonProps) {
+export default function GoBack({ sx, homePath = "/", children, ...props }: ButtonProps) {
   const admin = useAdmin();
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ export default function GoBack({ sx, homePath = "/", ...props }: ButtonProps) {
       startIcon={<KeyboardArrowLeftIcon />}
       {...props}
     >
-      Regresar
+      {children === undefined ? "Regresar" : children}
     </Button>
   );
 }
