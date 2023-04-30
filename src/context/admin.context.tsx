@@ -46,7 +46,7 @@ export function AdminProvider({ children }: { children: React.ReactNode | React.
 
   const signIn: SignInFunction = (admin) => {
     setAdmin(admin);
-    navigate(setAdminParams("", admin));
+    navigate(setAdminParams("/", admin));
   };
 
   return (

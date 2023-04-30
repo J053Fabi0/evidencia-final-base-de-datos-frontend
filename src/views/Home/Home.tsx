@@ -63,7 +63,7 @@ export default function Home() {
   }, [students, careers]);
 
   const onCellClick = (id: Student["id"]) => {
-    if (students && students.find((s) => s.id === id)) navigate(setAdminParams(`student/${id}`, admin));
+    if (students && students.find((s) => s.id === id)) navigate(setAdminParams(`/student/${id}`, admin));
   };
 
   if (admin === null) return null;

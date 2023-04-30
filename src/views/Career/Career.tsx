@@ -47,16 +47,33 @@ export default function Career() {
     handleChange(event);
   }
 
-  const handleOnSubmit = async (values: Schema) => {
+  const handleOnSubmit = async (
+    values: Schema,
+    deleting: FormikHelpers<Schema>["setSubmitting"] | false = false
+  ) => {
     setError(null);
     try {
+      // Creating a new career
       if (creating) {
         const { data } = await http.post<{ message: string }>("/career", values);
         await reloadCareers();
         dialog.setTitle("Registrado exitosamente");
         dialog.setOpen(true);
         navigate(setAdminParams(`/career/${data.message}`, admin));
-      } else {
+      }
+      // Deleting an existing career
+      else if (deleting) {
+        await http.delete(`/career/${id}`);
+        dialog.setTitle("Eliminada exitosamente");
+        dialog.setOpen(true);
+        dialog.setOnClose(() => () => {
+          reloadCareers();
+          navigate(setAdminParams("/careers", admin));
+          deleting(false);
+        });
+      }
+      // Upating an existing career
+      else {
         await http.patch("/career", { ...values, id });
         await reloadCareers();
         dialog.setTitle("Guardado exitosamente");
@@ -78,7 +95,7 @@ export default function Career() {
   if (!creating && !career) return <Typography variant="h2">Carrera no encontrada</Typography>;
   return (
     <Paper sx={{ p: 3, mt: 3, position: "relative" }} elevation={3}>
-      <GoBack />
+      <GoBack homePath="/careers" />
 
       <Typography variant="h3" align="center" mb={{ xs: 3, lg: 3 }} mt={{ xs: 1, lg: 0 }}>
         {creating ? "Crear una carrera" : career!.name} <School fontSize="large" />
@@ -135,6 +152,30 @@ export default function Career() {
                   disabled={(!creating && a.values.name === career!.name) || a.isSubmitting || !a.isValid}
                 >
                   Guardar
+                </LoadingButton>
+
+                {/* Delete button */}
+                <LoadingButton
+                  sx={{
+                    mb: { sm: 3 },
+                    mr: { sm: 3 },
+                    right: { sm: 0 },
+                    bottom: { sm: 0 },
+                    ml: { xs: 3, sm: 0 },
+                    position: { sm: "absolute" },
+                    display: career ? "block" : "none",
+                  }}
+                  color="error"
+                  variant="outlined"
+                  loading={a.isSubmitting}
+                  disabled={a.isSubmitting}
+                  onClick={async () => {
+                    a.setSubmitting(true);
+                    const error = await handleOnSubmit(a.values, a.setSubmitting);
+                    if (error) a.setSubmitting(false);
+                  }}
+                >
+                  Eliminar
                 </LoadingButton>
               </CenteredHorizontalBox>
             </FormikForm>
