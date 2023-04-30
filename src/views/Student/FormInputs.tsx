@@ -4,11 +4,35 @@ import hasError from "../../utils/hasError";
 import { statuses } from "../../types/status.type";
 import { useCareers } from "../../context/careers.context";
 import { Schema, maxDate, minDate, spacerFor } from "./studentUtils";
+import { capitalizeFirstLetters } from "../../utils/capitalizeFirstLetter";
+import deleteExtraSpacesInBetween from "../../utils/deleteExtraSpacesInBetween";
 import { CenteredHorizontalBox, FormikSimpleTextField } from "../../components/Mixins";
 import { Box, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 
 export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
   const careers = useCareers();
+
+  const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = deleteExtraSpacesInBetween(capitalizeFirstLetters(event.target.value));
+    if (/^ .*/.test(event.target.value)) event.target.value = event.target.value.trim();
+    a.handleChange(event);
+  };
+
+  const handleChangeAnTrim = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.trim();
+    a.handleChange(event);
+  };
+
+  const handleChangeDeleteExtraSpaces = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = deleteExtraSpacesInBetween(event.target.value);
+    a.handleChange(event);
+  };
+
+  const handleChangePhone = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // allow + ( ) - and numbers
+    event.target.value = deleteExtraSpacesInBetween(event.target.value.replace(/[^0-9+()\- ]/g, ""));
+    a.handleChange(event);
+  };
 
   if (!careers) return null;
   return (
@@ -23,8 +47,8 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             onBlur={a.handleBlur}
             value={a.values.name}
             disabled={a.isSubmitting}
-            onChange={a.handleChange}
             errorName={a.errors.name}
+            onChange={handleChangeName}
             hasError={hasError("name", a)}
           />
         </Grid>
@@ -37,7 +61,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             label="Apellidos"
             onBlur={a.handleBlur}
             disabled={a.isSubmitting}
-            onChange={a.handleChange}
+            onChange={handleChangeName}
             value={a.values.secondName}
             errorName={a.errors.secondName}
             hasError={hasError("secondName", a)}
@@ -117,7 +141,7 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
           </FormControl>
         </Grid>
 
-        <Grid item mt={3} {...spacerFor[1]}>
+        <Grid item mt={2} {...spacerFor[1]}>
           <CenteredHorizontalBox>
             <Typography variant="h5">Datos opcionales</Typography>
           </CenteredHorizontalBox>
@@ -132,9 +156,9 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             onBlur={a.handleBlur}
             value={a.values.email}
             disabled={a.isSubmitting}
-            onChange={a.handleChange}
             errorName={a.errors.email}
             label="Correo electrónico"
+            onChange={handleChangeAnTrim}
             hasError={hasError("email", a)}
           />
         </Grid>
@@ -147,8 +171,8 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             onBlur={a.handleBlur}
             value={a.values.phone}
             disabled={a.isSubmitting}
-            onChange={a.handleChange}
             errorName={a.errors.phone}
+            onChange={handleChangePhone}
             hasError={hasError("phone", a)}
           />
         </Grid>
@@ -161,9 +185,9 @@ export default function FormInputs({ a }: { a: FormikProps<Schema> }) {
             onBlur={a.handleBlur}
             value={a.values.direction}
             disabled={a.isSubmitting}
-            onChange={a.handleChange}
             errorName={a.errors.direction}
             hasError={hasError("direction", a)}
+            onChange={handleChangeDeleteExtraSpaces}
           />
         </Grid>
       </Grid>

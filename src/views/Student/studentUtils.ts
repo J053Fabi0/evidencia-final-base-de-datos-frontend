@@ -36,6 +36,8 @@ export const getValuesToPatch = (values: Schema, defaultValues: Schema) => {
     (Object.entries(values) as [keyof Schema, string | Date][])
       // filter out values that are the same as the student's
       .filter(([key, value]) => `${value}` !== `${defaultValues[key]}`)
+      // trim all strings
+      .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
   ) as Partial<Schema>;
 };
 
