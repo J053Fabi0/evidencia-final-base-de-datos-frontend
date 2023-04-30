@@ -21,6 +21,7 @@ import { setAdminParams } from "../../utils/setAdminParams";
 import { isServerError } from "../../types/serverError.type";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useReloadStudents, useStudents } from "../../context/students.context";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import {
   Box,
   Grid,
@@ -32,6 +33,7 @@ import {
   Typography,
   FormControl,
   FormHelperText,
+  Button,
 } from "@mui/material";
 import useTextDialog from "../../hooks/useTextDialog";
 
@@ -157,7 +159,21 @@ export default function Student() {
   if (loading) return <CenteredCircularProgress />;
   if (!student && id) return <Typography variant="h2">Estudiante no encontrado</Typography>;
   return (
-    <Paper sx={{ p: 3, mt: 3 }} elevation={3}>
+    <Paper sx={{ p: 3, mt: 3, position: "relative" }} elevation={3}>
+      <Button
+        sx={{ position: "absolute", top: 0, left: 0, mt: 2, ml: 2 }}
+        onClick={() => {
+          // go back in the history if possible
+          if (window.history.length > 2) window.history.back();
+          // go to home if not
+          else navigate(setAdminParams("/", admin));
+        }}
+        variant="outlined"
+        startIcon={<KeyboardArrowLeftIcon />}
+      >
+        Regresar
+      </Button>
+
       <Typography variant="h2" align="center">
         {student ? `${student.name} ${student.secondName}` : "Registrar estudiante"}
       </Typography>
