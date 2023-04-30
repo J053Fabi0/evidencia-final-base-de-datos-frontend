@@ -1,6 +1,7 @@
 import * as Yup from "yup";
+import Career from "../../types/career.type";
 
-export const defaultValues = { name: "" };
+export const defaultValues = (career?: Career) => ({ name: (career && career.name) ?? "" });
 
 export interface Schema {
   name: string;

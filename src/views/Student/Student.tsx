@@ -36,10 +36,10 @@ export default function Student() {
   const [error, setError] = useState<string | null>(null);
   const setValuesRef = useRef<FormikHelpers<Schema>["setValues"]>();
 
-  // Set the default values every time the student or the default values change
+  // Set the default values every time the student changes
   useLayoutEffect(() => {
     if (setValuesRef.current) setValuesRef.current(defaultValues);
-  }, [student, defaultValues]);
+  }, [defaultValues]);
 
   // Returns true if there was an error
   const handleOnSubmit = async (

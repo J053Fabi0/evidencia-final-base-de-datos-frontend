@@ -20,7 +20,13 @@ export function CareersProvider({ children }: { children: React.ReactNode | Reac
   const reload = useCallback(async () => {
     if (!admin) return;
 
-    setCareers((await http.get<{ message: Career[] }>("/careers")).data.message);
+    const newCareers = (
+      await http.get<{ message: Omit<Career, "inactiveStudents">[] }>("/careers")
+    ).data.message.map(
+      (career) => ({ ...career, inactiveStudents: career.totalStudents - career.activeStudents } as Career)
+    );
+
+    setCareers(newCareers);
   }, [admin]);
 
   useEffect(() => {
