@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAdmin, useSignOut } from "../context/admin.context";
-import { AccountCircle, Add, School, Logout, Menu as MenuIcon, ListAlt } from "@mui/icons-material";
+import { AccountCircle, School, Logout, Menu as MenuIcon, ListAlt } from "@mui/icons-material";
 
 import { Container, ListItemIcon, ListItemText } from "@mui/material";
 import { Typography, Menu, MenuItem, IconButton, Toolbar, AppBar, Box } from "@mui/material";
@@ -72,14 +72,6 @@ export default function Navbar() {
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-              <Link to={setAdminParams("/student", admin)} style={{ textDecoration: "none", color: "inherit" }}>
-                <MenuItem onClick={handleClose("menu")}>
-                  <ListItemIcon>
-                    <Add />
-                  </ListItemIcon>
-                  <ListItemText>Registrar estudiante</ListItemText>
-                </MenuItem>
-              </Link>
               <Link to={setAdminParams("/careers", admin)} style={{ textDecoration: "none", color: "inherit" }}>
                 <MenuItem onClick={handleClose("menu")}>
                   <ListItemIcon>
@@ -88,12 +80,12 @@ export default function Navbar() {
                   <ListItemText>Carreras</ListItemText>
                 </MenuItem>
               </Link>
-              <Link to={setAdminParams("/career/new", admin)} style={{ textDecoration: "none", color: "inherit" }}>
+              <Link to={setAdminParams("/", admin)} style={{ textDecoration: "none", color: "inherit" }}>
                 <MenuItem onClick={handleClose("menu")}>
                   <ListItemIcon>
                     <School />
                   </ListItemIcon>
-                  <ListItemText>Crear carrera</ListItemText>
+                  <ListItemText>Estudiantes</ListItemText>
                 </MenuItem>
               </Link>
             </Menu>
