@@ -120,6 +120,9 @@ export default function Signin() {
                     id="outlined-adornment-password"
                     type={showPassword ? "text" : "password"}
                     onChange={(e) => a.handleChange({ target: { id: "password", value: e.target.value } })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") a.submitForm();
+                    }}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
