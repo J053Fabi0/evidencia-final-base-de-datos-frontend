@@ -1,23 +1,22 @@
-import { useLayoutEffect, useRef, useState } from "react";
 import http from "../../http-common";
 import { LoadingButton } from "@mui/lab";
 import hasError from "../../utils/hasError";
 import { School } from "@mui/icons-material";
+import GoBack from "../../components/GoBack";
 import Grid from "@mui/material/Unstable_Grid2";
 import useTextDialog from "../../hooks/useTextDialog";
 import { useAdmin } from "../../context/admin.context";
-import useErrorDialog from "../../hooks/useErrorDialog";
 import { Alert, Paper, Typography } from "@mui/material";
+import { useLayoutEffect, useRef, useState } from "react";
+import { useShowError } from "../../context/error.context";
 import { setAdminParams } from "../../utils/setAdminParams";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { isServerError } from "../../types/serverError.type";
 import { defaultValues, schema, Schema } from "./careerUtils";
-import { Formik, Form as FormikForm, FormikHelpers, FormikProps } from "formik";
-import { useCareers, useReloadCareers } from "../../context/careers.context";
 import capitalizeFirstLetter from "../../utils/capitalizeFirstLetter";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useCareers, useReloadCareers } from "../../context/careers.context";
+import { Formik, Form as FormikForm, FormikHelpers, FormikProps } from "formik";
 import deleteExtraSpacesInBetween from "../../utils/deleteExtraSpacesInBetween";
 import { CenteredCircularProgress, CenteredHorizontalBox, FormikSimpleTextField } from "../../components/Mixins";
-import GoBack from "../../components/GoBack";
 
 export default function Career() {
   const admin = useAdmin();
@@ -25,12 +24,12 @@ export default function Career() {
   const careers = useCareers();
   const navigate = useNavigate();
   const location = useLocation();
+  const showError = useShowError();
   const reloadCareers = useReloadCareers();
   const dialog = useTextDialog({ content: null });
   const career = careers?.find((c) => c.id === id);
   const creating = location.pathname.includes("new");
   const [error, setError] = useState<string | null>(null);
-  const { Dialog: ErrorDialog, showError } = useErrorDialog();
   const setValuesRef = useRef<FormikHelpers<Schema>["setValues"]>();
 
   // Set the default values every time the career changes
@@ -80,12 +79,7 @@ export default function Career() {
         dialog.setOpen(true);
       }
     } catch (e: unknown) {
-      if (isServerError(e)) {
-        const error = e.response?.data.error;
-        if (e.response?.status === 401 || error === "Unauthorized") navigate("/signin");
-        else if (error) setError(error.description);
-        else setError("Error desconocido");
-      } else showError(e as Error);
+      showError(e as Error);
       return true;
     }
     return false;
@@ -184,7 +178,6 @@ export default function Career() {
       </Formik>
 
       {dialog.Dialog}
-      {ErrorDialog}
     </Paper>
   );
 }

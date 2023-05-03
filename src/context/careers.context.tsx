@@ -2,6 +2,8 @@ import http from "../http-common";
 import Career from "../types/career.type";
 import { useAdmin } from "./admin.context";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useShowError } from "./error.context";
+import isError from "../utils/isError";
 
 export type CareersOrNull = Career[] | null;
 
@@ -15,19 +17,24 @@ export const useCareersUpdate = () => useContext(CareersUpdateContext);
 
 export function CareersProvider({ children }: { children: React.ReactNode | React.ReactNode[] }) {
   const admin = useAdmin();
+  const showError = useShowError();
   const [careers, setCareers] = useState<CareersOrNull>(null);
 
   const reload = useCallback(async () => {
     if (!admin) return;
 
-    const newCareers = (
-      await http.get<{ message: Omit<Career, "inactiveStudents">[] }>("/careers")
-    ).data.message.map(
-      (career) => ({ ...career, inactiveStudents: career.totalStudents - career.activeStudents } as Career)
-    );
+    try {
+      const newCareers = (
+        await http.get<{ message: Omit<Career, "inactiveStudents">[] }>("/careers")
+      ).data.message.map(
+        (career) => ({ ...career, inactiveStudents: career.totalStudents - career.activeStudents } as Career)
+      );
 
-    setCareers(newCareers);
-  }, [admin]);
+      setCareers(newCareers);
+    } catch (e) {
+      if (isError(e)) showError(e);
+    }
+  }, [admin, showError]);
 
   useEffect(() => {
     if (!admin) return;

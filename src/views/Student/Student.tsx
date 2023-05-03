@@ -9,12 +9,11 @@ import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 import useTextDialog from "../../hooks/useTextDialog";
 import { useAdmin } from "../../context/admin.context";
-import useErrorDialog from "../../hooks/useErrorDialog";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useCareers } from "../../context/careers.context";
+import { useShowError } from "../../context/error.context";
 import { setAdminParams } from "../../utils/setAdminParams";
-import { isServerError } from "../../types/serverError.type";
 import { Formik, Form as FormikForm, FormikHelpers } from "formik";
 import { useReloadStudents, useStudents } from "../../context/students.context";
 import { getValuesToPatch, Schema, useDefaultValues, schema } from "./studentUtils";
@@ -26,12 +25,12 @@ export default function Student() {
   const careers = useCareers();
   const navigate = useNavigate();
   const students = useStudents();
+  const showError = useShowError();
   const reloadStudents = useReloadStudents();
   const dialog = useTextDialog({ content: null });
   const student = students?.find((s) => s.id === id);
   const loading = students === null || careers === null;
   const defaultValues = useDefaultValues(student, careers);
-  const { Dialog: ErrorDialog, showError } = useErrorDialog();
 
   const [error, setError] = useState<string | null>(null);
   const setValuesRef = useRef<FormikHelpers<Schema>["setValues"]>();
@@ -77,12 +76,7 @@ export default function Student() {
         navigate(setAdminParams(`/student/${data.message}`, admin));
       }
     } catch (e: unknown) {
-      if (isServerError(e)) {
-        const error = e.response?.data.error;
-        if (e.response?.status === 401 || error === "Unauthorized") navigate("/signin");
-        else if (error) setError(error.description);
-        else setError("Error desconocido");
-      } else showError(e as Error);
+      showError(e as Error);
       return true;
     }
     return false;
@@ -165,7 +159,6 @@ export default function Student() {
         }}
       </Formik>
 
-      {ErrorDialog}
       {dialog.Dialog}
     </Paper>
   );

@@ -1,28 +1,24 @@
 import * as Yup from "yup";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import http from "../../http-common";
 import { LoadingButton } from "@mui/lab";
 import hasError from "../../utils/hasError";
-import { useLocation } from "react-router-dom";
 import { Formik, Form as FormikForm } from "formik";
-import useErrorDialog from "../../hooks/useErrorDialog";
+import { useShowError } from "../../context/error.context";
 import { isServerError } from "../../types/serverError.type";
-import useRedirectIfTrue from "../../hooks/useRedirectIfTrue";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAdmin, useSignIn } from "../../context/admin.context";
-import { OutlinedInput, FormHelperText, Alert } from "@mui/material";
-import { Box, TextField, Container, InputLabel, Typography, FormControl } from "@mui/material";
+import { Box, Container, InputLabel, Typography, FormControl } from "@mui/material";
+import { OutlinedInput, FormHelperText, Alert, InputAdornment, IconButton } from "@mui/material";
 
 export default function Signin() {
   const admin = useAdmin();
-  useRedirectIfTrue(admin !== null, "/");
-
-  const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
 
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const signIn = useSignIn();
-  const { Dialog: ErrorDialog, showError } = useErrorDialog();
+  const showError = useShowError();
 
   const schema = Yup.object().shape({
     username: Yup.string().required("Requerido."),
@@ -40,7 +36,7 @@ export default function Signin() {
         const error = e.response?.data.error;
         if (e.response?.status === 401 || error === "Unauthorized") setError("Usuario o contraseña equivocada");
         else if (error) setError(error.description);
-        else setError("Error desconocido");
+        else showError(e);
       } else showError(e as Error);
       return false;
     }
@@ -48,12 +44,17 @@ export default function Signin() {
     return true;
   };
 
-  const defaultValues = {
-    username: queryParams.get("username") ?? "",
-    password: queryParams.get("password") ?? "",
-  };
+  const defaultValues = useMemo(
+    () => ({
+      username: (admin && admin.username) || "",
+      password: (admin && admin.password) || "",
+    }),
+    [admin]
+  );
 
-  return admin ? null : (
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  return (
     <Container sx={{ mt: 3, mb: 5 }}>
       {/* Logotipo y título */}
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -104,23 +105,35 @@ export default function Signin() {
                 </FormControl>
 
                 {/* Contraseña */}
-                <TextField
+                <FormControl
                   fullWidth
                   id="password"
                   sx={{ mt: 3 }}
-                  type="password"
-                  label="Contraseña"
                   variant="outlined"
-                  onBlur={a.handleBlur}
-                  value={a.values.password}
                   disabled={a.isSubmitting}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") a.submitForm();
-                  }}
-                  onChange={a.handleChange}
                   error={hasError("password", a)}
-                  helperText={hasError("password", a) ? a.errors.password : ""}
-                />
+                >
+                  <InputLabel htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                  <OutlinedInput
+                    label="Contraseña"
+                    value={a.values.password}
+                    id="outlined-adornment-password"
+                    type={showPassword ? "text" : "password"}
+                    onChange={(e) => a.handleChange({ target: { id: "password", value: e.target.value } })}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={(e) => e.preventDefault()}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                  <FormHelperText>{(hasError("password", a) && a.errors.password) || ""}</FormHelperText>
+                </FormControl>
 
                 <Box
                   sx={{
@@ -130,7 +143,12 @@ export default function Signin() {
                     flexDirection: "column",
                   }}
                 >
-                  <LoadingButton variant="contained" onClick={a.submitForm} loading={a.isSubmitting}>
+                  <LoadingButton
+                    variant="contained"
+                    onClick={a.submitForm}
+                    loading={a.isSubmitting}
+                    disabled={a.isSubmitting || !a.isValid}
+                  >
                     Iniciar Sesión
                   </LoadingButton>
                 </Box>
@@ -139,8 +157,6 @@ export default function Signin() {
           </FormikForm>
         )}
       </Formik>
-
-      {ErrorDialog}
     </Container>
   );
 }

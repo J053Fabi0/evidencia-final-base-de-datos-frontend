@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import useDialog from "./useDialog";
 import styled from "@emotion/styled";
+import isError from "../utils/isError";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import stringifyError from "../utils/stringifyError";
@@ -20,17 +21,22 @@ export default function useErrorDialog({
   openDefault = false,
   title = "Hubo un error desconocido :(",
 } = {}) {
-  const [error, setError] = useState<Error>(() => new Error());
+  const [error, setError] = useState<Error | string | Record<string, any>>(() => new Error());
   const [copied, setCopied] = useState(false);
 
-  const errorString = useMemo(() => stringifyError(error), [error]);
+  const errorString = useMemo(() => (typeof error === "string" ? error : stringifyError(error)), [error]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(errorString);
     setCopied(true);
   }, [errorString]);
 
-  const createContentElement = (content: React.ReactNode) => <Typography component={Code}>{content}</Typography>;
+  const createContentElement = useCallback(
+    (content: React.ReactNode) =>
+      isError(error) ? <Typography component={Code}>{content}</Typography> : <Typography>{content}</Typography>,
+    [error]
+  );
+
   const createActionsElement = useCallback(
     () => (
       <>
@@ -57,26 +63,38 @@ export default function useErrorDialog({
   useEffect(() => {
     setContent(createContentElement(errorString));
     setActions(createActionsElement());
-  }, [createActionsElement, error, errorString, setActions, setContent]);
+  }, [createActionsElement, createContentElement, error, errorString, setActions, setContent]);
 
   useEffect(() => {
     if (open) console.error(error);
   }, [open, error]);
 
-  return {
-    title: stateTitle,
-    setTitle,
-    open,
-    setOpen: (open: Parameters<typeof setOpen>[0]) => {
-      setOpen(open);
-      setCopied(false);
-    },
-    setError,
-    showError: (error: Parameters<typeof setError>[0], open = true) => {
-      setOpen(open);
+  const showError = useCallback(
+    (error: Parameters<typeof setError>[0], open = true) => {
       setError(error);
+      setOpen(open);
       setCopied(false);
     },
+    [setOpen]
+  );
+
+  const setOpenDefault = useCallback(
+    (open: Parameters<typeof setOpen>[0]) => {
+      setOpen(open);
+      setCopied(false);
+    },
+    [setOpen]
+  );
+
+  return {
+    open,
+    error,
     Dialog,
+    setTitle,
+    setError,
+    showError,
+    errorString,
+    title: stateTitle,
+    setOpen: setOpenDefault,
   };
 }

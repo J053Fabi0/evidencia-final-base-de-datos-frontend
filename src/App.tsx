@@ -7,6 +7,7 @@ import Student from "./views/Student/Student";
 import Careers from "./views/Careers/Careers";
 import NavbarHOC from "./components/NavbarHOC";
 import { AdminProvider } from "./context/admin.context";
+import { ErrorProvider } from "./context/error.context";
 import { CareersProvider } from "./context/careers.context";
 import { StudentsProvider } from "./context/students.context";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
@@ -16,24 +17,26 @@ moment.locale("es-mx");
 export default function App() {
   return (
     <BrowserRouter>
-      <AdminProvider>
-        <CareersProvider>
-          <StudentsProvider>
-            <Routes>
-              <Route path="/" element={NavbarHOC(Home)} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/student" element={NavbarHOC(Student)} />
-              <Route path="/student/:id" element={NavbarHOC(Student)} />
-              <Route path="/careers" element={NavbarHOC(Careers)} />
-              <Route path="/career/new" element={NavbarHOC(Career)} />
-              <Route path="/career/:id" element={NavbarHOC(Career)} />
+      <ErrorProvider>
+        <AdminProvider>
+          <CareersProvider>
+            <StudentsProvider>
+              <Routes>
+                <Route path="/" element={NavbarHOC(Home)} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/student" element={NavbarHOC(Student)} />
+                <Route path="/student/:id" element={NavbarHOC(Student)} />
+                <Route path="/careers" element={NavbarHOC(Careers)} />
+                <Route path="/career/new" element={NavbarHOC(Career)} />
+                <Route path="/career/:id" element={NavbarHOC(Career)} />
 
-              {/* Default route */}
-              <Route path="*" element={NavbarHOC(Home)} />
-            </Routes>
-          </StudentsProvider>
-        </CareersProvider>
-      </AdminProvider>
+                {/* Default route */}
+                <Route path="*" element={NavbarHOC(Home)} />
+              </Routes>
+            </StudentsProvider>
+          </CareersProvider>
+        </AdminProvider>
+      </ErrorProvider>
     </BrowserRouter>
   );
 }

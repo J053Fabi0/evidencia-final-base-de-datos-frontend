@@ -17,25 +17,34 @@ export const useSignIn = (): SignInFunction => useContext(SignInContext);
 export const useAdmin = (): AdminOrNull => useContext(AdminContext);
 export const useSignOut = (): SignOutFunction => useContext(SignOutContext);
 
+const getAdminOrNull = (search: string): AdminOrNull => {
+  const queryParams = new URLSearchParams(search);
+  return queryParams.has("username") && queryParams.has("password")
+    ? { username: queryParams.get("username") ?? "", password: queryParams.get("password") ?? "" }
+    : null;
+};
+
+const setDefaultAuthParams = (admin: AdminOrNull) => {
+  // set default query params for http requests. ?password and ?username
+  http.interceptors.request.clear();
+  http.interceptors.request.use((config) => {
+    // if the endpoint is "/" don't add the params
+    if (config.url === "/") return config;
+
+    config.params = config.params || {};
+    config.params.username = admin ? admin.username : config.params.username;
+    config.params.password = admin ? admin.password : config.params.password;
+    return config;
+  });
+};
+
 export function AdminProvider({ children }: { children: React.ReactNode | React.ReactNode[] }) {
   const navigate = useNavigate();
   const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
-  const [admin, setAdmin] = useState<Admin | null>(() =>
-    queryParams.has("username") && queryParams.has("password")
-      ? { username: queryParams.get("username") ?? "", password: queryParams.get("password") ?? "" }
-      : null
-  );
+  const [admin, setAdmin] = useState<Admin | null>(() => getAdminOrNull(search));
 
   useEffect(() => {
-    // set default query params for http requests. ?password and ?username
-    http.interceptors.request.use((config) => {
-      config.params = config.params || {};
-      config.params.username = admin ? admin.username : config.params.username;
-      config.params.password = admin ? admin.password : config.params.password;
-      return config;
-    });
-
+    setDefaultAuthParams(admin);
     if (!admin) navigate("/signin");
   }, [admin, navigate]);
 

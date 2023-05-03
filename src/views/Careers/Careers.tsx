@@ -17,8 +17,8 @@ const columns: GridColDef[] = [
 ];
 
 interface Row {
-  id: Career["id"];
   name: string;
+  id: Career["id"];
   totalStudents: number;
   activeStudents: number;
   inactiveStudents: number;
@@ -27,13 +27,13 @@ interface Row {
 const pageSize = 9;
 
 export default function Careers() {
-  const careers = useCareers();
   const admin = useAdmin();
-  const [rows, setRows] = useState<Row[]>([]);
+  const careers = useCareers();
+  const navigate = useNavigate();
   const { search } = useLocation();
+  const [rows, setRows] = useState<Row[]>([]);
   const queryParams = new URLSearchParams(search);
   const page = (parseInt(queryParams.get("page") ?? "1") || 1) - 1;
-  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     if (careers !== null)

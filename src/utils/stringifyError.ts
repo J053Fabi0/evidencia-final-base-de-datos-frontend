@@ -1,8 +1,8 @@
-export default function stringifyError(obj: Error, indent = 2) {
+export default function stringifyError(obj: Error | Record<string, any>, indent = 2) {
   return stringifyError_(obj, 0, indent);
 }
 
-function stringifyError_(obj: Error, prevIndent = 0, indent: number) {
+function stringifyError_(obj: Error | Record<string, any>, prevIndent = 0, indent: number) {
   const isObject = typeof obj === "object" && !Array.isArray(obj) && obj !== null;
   if (!isObject) return JSON.stringify(obj);
 

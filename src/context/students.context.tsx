@@ -1,5 +1,7 @@
 import http from "../http-common";
+import isError from "../utils/isError";
 import { useAdmin } from "./admin.context";
+import { useShowError } from "./error.context";
 import Student, { StudentRaw } from "../types/student.type";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
@@ -15,19 +17,24 @@ export const useStudentsUpdate = () => useContext(StudentsUpdateContext);
 
 export function StudentsProvider({ children }: { children: React.ReactNode | React.ReactNode[] }) {
   const admin = useAdmin();
+  const showError = useShowError();
   const [students, setStudents] = useState<StudentsOrNull>(null);
 
   const reload = useCallback(async () => {
     if (!admin) return;
 
-    const { message: studentsRaw } = (await http.get<{ message: StudentRaw[] }>("/students")).data;
-    setStudents(
-      studentsRaw.map((s) => ({
-        ...s,
-        birthDate: new Date(s.birthDate),
-      }))
-    );
-  }, [admin]);
+    try {
+      const { message: studentsRaw } = (await http.get<{ message: StudentRaw[] }>("/students")).data;
+      setStudents(
+        studentsRaw.map((s) => ({
+          ...s,
+          birthDate: new Date(s.birthDate),
+        }))
+      );
+    } catch (e) {
+      if (isError(e)) showError(e);
+    }
+  }, [admin, showError]);
 
   useEffect(() => {
     if (!admin) return;
