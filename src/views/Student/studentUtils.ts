@@ -1,8 +1,8 @@
 import * as Yup from "yup";
 import { useMemo } from "react";
 import Student from "../../types/student.type";
-import { CareersOrNull } from "../../context/careers.context";
 import { statuses } from "../../types/status.type";
+import { CareersOrNull } from "../../context/careers.context";
 
 const minYears = 18;
 const maxYears = 35;
