@@ -10,10 +10,10 @@ import { CenteredCircularProgress } from "../../components/Mixins";
 import { DataGrid, GridColDef, GridPagination } from "@mui/x-data-grid";
 
 const columns: GridColDef[] = [
-  { field: "name", headerName: "Nombre", width: 400 },
-  { field: "totalStudents", headerName: "Estudiantes totales", width: 180 },
-  { field: "activeStudents", headerName: "Estudanties inscritos", width: 180 },
-  { field: "inactiveStudents", headerName: "Estudiantes no inscritos", width: 180 },
+  { field: "name", headerName: "Nombre", width: 450 },
+  { field: "totalStudents", headerName: "Total", width: 100 },
+  { field: "activeStudents", headerName: "Inscritos", width: 100 },
+  { field: "inactiveStudents", headerName: "No inscritos", width: 100 },
 ];
 
 interface Row {
