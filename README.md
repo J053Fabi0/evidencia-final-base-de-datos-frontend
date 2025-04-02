@@ -1,3 +1,9 @@
+![image](https://github.com/user-attachments/assets/4eae7661-7c39-4fc7-99ef-aa426607284b)
+![image](https://github.com/user-attachments/assets/97f5b5bf-1c78-4bed-b98e-2fe242223e6d)
+![image](https://github.com/user-attachments/assets/1ccbf5c9-e24a-4d84-b10a-dbaded487d72)
+![image](https://github.com/user-attachments/assets/1767c35f-278d-4296-a192-0a05133ceeb3)
+
+
 # Create a `constants.ts` file
 
 Copy `src/utils/constants.example.ts` to `src/utils/constants.ts` and fill in the values.
